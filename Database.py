@@ -11,6 +11,7 @@ ADD_FFT_AND_TEMPO = 'add_fft_and_tempo.sql'
 NOT_FFTED_SOUND = 'get_not_ffted_sound.sql'
 NEW_ID_PAIRS = 'not_existings_correlations.sql'
 FFT_BY_ID = 'get_fft_by_id.sql'
+NEW_CORRELATION = 'add_correlation.sql'
 
 def _load_sql_query(query_filename: str) -> str:
     try:
@@ -84,3 +85,7 @@ def get_data_from_pair(pair: tuple) -> list:
     query = _load_sql_query(FFT_BY_ID)
     res = _execute_query_with_param(query, pair)
     return res
+
+def add_correlation(first: int, second: int, value: float):
+    query = _load_sql_query(NEW_CORRELATION)
+    _execute_query_with_param(query, (first, second, value))

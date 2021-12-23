@@ -10,6 +10,7 @@ import CorrelationCalculator as cc
 
 '''
     TODO: usuwanie z bazy nieistniejących piosenek
+    TODO: updejt przy każdym braku, nie tylko nowych plikach
 '''
 
 MAIN_DIR = 'data'
@@ -48,13 +49,14 @@ class SoundTransformer:
     def _load_matrix(self, window):
         pair_list = db.get_new_id_pairs()
         i = 0
-        wm.updateProgressWindow(window, 'Loading matrix', i, len(pair_list))
+        max = 1 if len(pair_list) == 0 else len(pair_list)
+        wm.updateProgressWindow(window, 'Updating matrix', i, max)
         for pair in pair_list:
             data = db.get_data_from_pair(pair)
-            print(pair, len(data))
-            #print(cc.calculate_correlation(data[0][0], data[1][0]))
+            value = cc.calculate_correlation(data[0][0], data[1][0])
+            db.add_correlation(pair[0], pair[1], value)
             i += 1
-            wm.updateProgressWindow(window, 'Loading matrix', i, len(pair_list))
+            wm.updateProgressWindow(window, 'Updating matrix', i, max)
     def _compute_correlation(self, window):
         pass
 
