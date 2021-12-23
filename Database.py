@@ -4,6 +4,7 @@ import os
 
 DATABASE_FILE = 'data/database.db'
 QUERY_DIR = 'data/sql'
+INIT_QUERY = 'init.sql'
 
 def _load_sql_query(query_filename: str) -> str:
     try:
@@ -15,6 +16,23 @@ def _load_sql_query(query_filename: str) -> str:
     except FileNotFoundError:
         return ""
 
+def _execute_query(query: str):
+    conn = None
+    res = []
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        res = cur.fetchall()
+    except sqlError as e:
+        print(e)
+    finally:
+        if conn:
+            conn.close()
+        return res
+
 def init():
-    print(_load_sql_query('init.sql'))
-    pass
+    queries = _load_sql_query(INIT_QUERY)
+    for query in queries.split(';'):
+        _execute_query(query+';')
