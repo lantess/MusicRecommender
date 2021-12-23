@@ -22,7 +22,7 @@ class WindowManager:
         return sg.Window('Analyzing new sounds', layout)
 
     @staticmethod
-    def updateProgressWindow(label: str, i: int, max: int, window):
+    def updateProgressWindow(window, label: str, i: int, max: int):
         window['-PERCENT-'].update(value=label+' (' + str(int(i / max * 100)) + '%)')
         window['-PROGRESS-'].update(current_count=i, max=max)
 

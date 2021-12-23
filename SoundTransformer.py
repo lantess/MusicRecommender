@@ -38,8 +38,7 @@ class SoundTransformer:
     def _fourier_new_files(self, window):
         i = 0
         max = len(self._new_files)
-        window['-PERCENT-'].update(value='Fouriering sounds (' + str(int(i / max * 100)) + '%)')
-        window['-PROGRESS-'].update(current_count=0, max=max)
+        wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
         for filename in self._new_files:
             sd.put(filename)
             file = os.path.join(WAV_DIR, filename)
@@ -56,14 +55,12 @@ class SoundTransformer:
             filedata.tempo = tempo[0]
             filedata.fft_len = len(yf)
             i+=1
-            window['-PERCENT-'].update(value='Fouriering sounds (' + str(int(i / max * 100)) + '%)')
-            window['-PROGRESS-'].update(current_count=i)
+            wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
 
     def _add_to_metafile(self, window):
         i = 0
         max = len(sd.get_names())
-        window['-PERCENT-'].update(value='Updating metadata (' + str(int(i / max * 100)) + '%)')
-        window['-PROGRESS-'].update(current_count=i, max=max)
+        wm.updateProgressWindow(window, 'Updating metadata', i, max)
         open(META_FILE, 'w+').close()
         for name in sd.get_names():
             data = sd.get(name)
@@ -71,24 +68,20 @@ class SoundTransformer:
             out.writelines([name, ';', str(data.fft_len), ';', str(data.tempo), ';\n'])
             out.close()
             i += 1
-            window['-PERCENT-'].update(value='Updating metadata (' + str(int(i / max * 100)) + '%)')
-            window['-PROGRESS-'].update(current_count=i)
+            wm.updateProgressWindow(window, 'Updating metadata', i, max)
 
     def _update_matrix_legend(self, window):
-        window['-PERCENT-'].update(value='Updating matrix legend (0%)')
-        window['-PROGRESS-'].update(current_count=0, max=1)
+        wm.updateProgressWindow(window, 'Updating matrix legend', 0, 1)
         for line in open(LEGEND_FILE, 'r'):
             self._matrix_filelist.append(line.replace('\n', ''))
         new_to_add = ['[NEW]'+s for s in sd.get_names() if s not in self._matrix_filelist]
         self._matrix_filelist = ['[DEL]'+s if s not in sd.get_names() else '[OLD]'+s for s in self._matrix_filelist]
         for line in new_to_add:
             self._matrix_filelist.append(line)
-        window['-PERCENT-'].update(value='Updating matrix legend (100%)')
-        window['-PROGRESS-'].update(current_count=1)
+        wm.updateProgressWindow(window, 'Updating matrix legend', 1, 1)
 
     def _load_matrix(self, window):
-        window['-PERCENT-'].update(value='Loading matrix (0%)')
-        window['-PROGRESS-'].update(current_count=0, max=1)
+        wm.updateProgressWindow(window, 'Loading matrix', 0, 1)
         dim = len([s for s in self._matrix_filelist if s.find('[NEW]') == -1])
         if dim == 0:
             return
@@ -97,21 +90,18 @@ class SoundTransformer:
         input.close()
         self._matrix = np.array(struct.unpack("f"*int(dim*dim), raw_data))
         cc.initialize(self._matrix, dim)
-        window['-PERCENT-'].update(value='Loading matrix (100%)')
-        window['-PROGRESS-'].update(current_count=1)
+        wm.updateProgressWindow(window, 'Loading matrix', 1, 1)
 
     def _compute_correlation(self, window):
         i = 0
         max = len(self._matrix_filelist)**2
-        window['-PERCENT-'].update(value='Computing correlations (' + str(int(i / max * 100)) + '%)')
-        window['-PROGRESS-'].update(current_count=i, max=max)
+        wm.updateProgressWindow(window, 'Computing correlations', i, max)
         for file in self._matrix_filelist:
             for com_file in self._matrix_filelist:
                 if file != com_file:
                     cc.compute(file, com_file)
                     i += 1
-                window['-PERCENT-'].update(value='Computing correlations (' + str(int(i / max * 100)) + '%)')
-                window['-PROGRESS-'].update(current_count=i)
+                wm.updateProgressWindow(window, 'Computing correlations', i, max)
 
     def __init__(self):
         self._new_files = []
