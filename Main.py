@@ -1,6 +1,7 @@
 from SoundTransformer import SoundTransformer
 from WindowManager import WindowManager as wm
 from WindowManager import WindowHandler as wh
+import Database as db
 
 st = SoundTransformer()
 
@@ -37,10 +38,8 @@ def create_initial_window():
         pass
 
 def main():
-    #try:
+    db.init()
     create_initial_window()
-    #except BaseException as error:
-    #    print(error)
 
 
 if __name__ == "__main__":

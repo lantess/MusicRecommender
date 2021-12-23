@@ -15,6 +15,7 @@ META_FILE = os.path.join(MAIN_DIR, 'meta.csv')
 LEGEND_FILE = os.path.join(MAIN_DIR, 'matrix.legend')
 MATRIX_FILE = os.path.join(MAIN_DIR, 'matrix.dat')
 FOURIER_SAMPLES = 640000
+FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
 
 class SoundTransformer:
     def _load_metadata(self):
