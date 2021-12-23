@@ -1,4 +1,6 @@
+import os
 
+import SoundTransformer as st
 
 _correlationFlattenedMatrix = []
 _out_matrix = []
@@ -12,16 +14,18 @@ def initialize(matrix, size):
     _size = size
 
 def compute_new_value(first: str, second: str):
-    pass
+    f_key = os.path.join(st.FFT_DIR, first.replace('.wav', '.bin'))
+    s_key = os.path.join(st.FFT_DIR, second.replace('.wav', '.bin'))
+    print('DEBUG: new value')
 
 def delete_value():
-    pass
+    print('DEBUG: deleted value')
 
 def delete_row():
-    pass
+    print('DEBUG: deleted row')
 
 def get_next_from_matrix():
-    pass
+    print('DEBUG: next value from matrix')
 
 def compute(first: str, second: str):
     f_tag = first[first.find('[')+1:first.find(']')]
@@ -31,6 +35,9 @@ def compute(first: str, second: str):
         delete_row()
     else:
         s_tag = second[second.find('[')+1:second.find(']')]
-
-    #s_tag = second[second.find('[') + 1:second.find(']')]
-
+        if s_tag == 'NEW':
+            compute_new_value(first[first.find(']')+1], second[second.find(']')+1])
+        elif s_tag == 'DEL':
+            delete_value()
+        else:
+            get_next_from_matrix()

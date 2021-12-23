@@ -9,7 +9,7 @@ import CorrelationCalculator as cc
 from WindowManager import WindowManager as wm
 
 MAIN_DIR = 'data'
-OUT_DIR = os.path.join(MAIN_DIR, 'fft')
+FFT_DIR = os.path.join(MAIN_DIR, 'fft')
 WAV_DIR = os.path.join(MAIN_DIR, 'wav')
 META_FILE = os.path.join(MAIN_DIR, 'meta.csv')
 LEGEND_FILE = os.path.join(MAIN_DIR, 'matrix.legend')
@@ -44,7 +44,7 @@ class SoundTransformer:
             file = os.path.join(WAV_DIR, filename)
             y, sr = librosa.load(file, sr=None)
             yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES))
-            out_file = os.path.join(OUT_DIR, filename.replace('.wav', '.bin'))
+            out_file = os.path.join(FFT_DIR, filename.replace('.wav', '.bin'))
             out = open(out_file, "wb+")
             for cell in yf:
                 out.write(struct.pack("f", cell))
@@ -95,7 +95,7 @@ class SoundTransformer:
         raw_data = input.read()
         input.close()
         self._matrix = np.array(struct.unpack("f"*int(dim*dim), raw_data))
-        cc.initialize(self._matrix)
+        cc.initialize(self._matrix, dim)
         window['-PERCENT-'].update(value='Loading matrix (100%)')
         window['-PROGRESS-'].update(current_count=1)
 
@@ -106,10 +106,11 @@ class SoundTransformer:
         window['-PROGRESS-'].update(current_count=i, max=max)
         for file in self._matrix_filelist:
             for com_file in self._matrix_filelist:
-
+                if file != com_file:
+                    cc.compute(file, com_file)
+                    i += 1
                 window['-PERCENT-'].update(value='Computing correlations (' + str(int(i / max * 100)) + '%)')
-                window['-PROGRESS-'].update(current_count=1)
-
+                window['-PROGRESS-'].update(current_count=i)
 
     def __init__(self):
         self._new_files = []
@@ -124,6 +125,7 @@ class SoundTransformer:
         self._add_to_metafile(window)
         self._update_matrix_legend(window)
         self._load_matrix(window)
+        self._compute_correlation(window)
         window.close()
         print('DEBUG: soundbase updated.')
 
