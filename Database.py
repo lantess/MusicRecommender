@@ -9,6 +9,8 @@ GET_SOUND_NAMES = 'get_sound_names.sql'
 ADD_SOUND_NAME = 'add_sound_name.sql'
 ADD_FFT_AND_TEMPO = 'add_fft_and_tempo.sql'
 NOT_FFTED_SOUND = 'get_not_ffted_sound.sql'
+NEW_ID_PAIRS = 'not_existings_correlations.sql'
+FFT_BY_ID = 'get_fft_by_id.sql'
 
 def _load_sql_query(query_filename: str) -> str:
     try:
@@ -43,9 +45,9 @@ def _execute_query_with_param(query: str, param):
         conn = sqlite3.connect(DATABASE_FILE)
         cur = conn.cursor()
         cur.execute(query, param)
-        conn.commit()
         res = cur.fetchall()
-    except sqlError as e:
+        conn.commit()
+    except BaseException as e:
         print(e, ' --- ', query)
     finally:
         if conn:
@@ -73,3 +75,12 @@ def add_fft_and_tempo(id, tempo, fft):
     queries = _load_sql_query(ADD_FFT_AND_TEMPO).split(';')
     _execute_query_with_param(queries[0] + ';', param=(id, tempo))
     _execute_query_with_param(queries[1] + ';', param=(id, fft))
+
+def get_new_id_pairs() -> list:
+    query = _load_sql_query(NEW_ID_PAIRS)
+    return _execute_query(query)
+
+def get_data_from_pair(pair: tuple) -> list:
+    query = _load_sql_query(FFT_BY_ID)
+    res = _execute_query_with_param(query, pair)
+    return res

@@ -4,10 +4,13 @@ import librosa
 import scipy.fft as fft
 import numpy as np
 
-import SoundDictionary as sd
-import CorrelationCalculator as cc
 from WindowManager import WindowManager as wm
 import Database as db
+import CorrelationCalculator as cc
+
+'''
+    TODO: usuwanie z bazy nieistniejących piosenek
+'''
 
 MAIN_DIR = 'data'
 FFT_DIR = os.path.join(MAIN_DIR, 'fft')
@@ -43,28 +46,28 @@ class SoundTransformer:
             wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
 
     def _load_matrix(self, window):
-        wm.updateProgressWindow(window, 'Loading matrix', 0, 1)
-        dim = len([s for s in self._matrix_filelist if s.find('[NEW]') == -1])
-
-        cc.initialize(self._matrix, dim)
-        wm.updateProgressWindow(window, 'Loading matrix', 1, 1)
-
+        pair_list = db.get_new_id_pairs()
+        i = 0
+        wm.updateProgressWindow(window, 'Loading matrix', i, len(pair_list))
+        for pair in pair_list:
+            data = db.get_data_from_pair(pair)
+            print(pair, len(data))
+            #print(cc.calculate_correlation(data[0][0], data[1][0]))
+            i += 1
+            wm.updateProgressWindow(window, 'Loading matrix', i, len(pair_list))
     def _compute_correlation(self, window):
         pass
 
     def __init__(self):
         self._new_files = True #TODO: Zmienić na False przy ostatecznych testach
-        self._matrix_filelist = []
-        self._matrix = [[]]
         self._find_new_files()
 
     def update_soundbase(self, window):
         window.Finalize()
         self._fourier_new_files(window)
         self._load_matrix(window)
-        #self._compute_correlation(window)
+        self._compute_correlation(window)
         window.close()
-        print('DEBUG: soundbase updated.')
 
     def has_new_files(self):
         return self._new_files
