@@ -5,6 +5,10 @@ import os
 DATABASE_FILE = 'data/database.db'
 QUERY_DIR = 'data/sql'
 INIT_QUERY = 'init.sql'
+GET_SOUND_NAMES = 'get_sound_names.sql'
+ADD_SOUND_NAME = 'add_sound_name.sql'
+ADD_FFT_AND_TEMPO = 'add_fft_and_tempo.sql'
+NOT_FFTED_SOUND = 'get_not_ffted_sound.sql'
 
 def _load_sql_query(query_filename: str) -> str:
     try:
@@ -26,13 +30,46 @@ def _execute_query(query: str):
         conn.commit()
         res = cur.fetchall()
     except sqlError as e:
-        print(e)
+        print(e, ' --- ', query)
+    finally:
+        if conn:
+            conn.close()
+        return res
+
+def _execute_query_with_param(query: str, param):
+    conn = None
+    res = []
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cur = conn.cursor()
+        cur.execute(query, param)
+        conn.commit()
+        res = cur.fetchall()
+    except sqlError as e:
+        print(e, ' --- ', query)
     finally:
         if conn:
             conn.close()
         return res
 
 def init():
-    queries = _load_sql_query(INIT_QUERY)
-    for query in queries.split(';'):
+    for query in _load_sql_query(INIT_QUERY).split(';'):
         _execute_query(query+';')
+
+
+def get_sound_names() -> list:
+    query = _load_sql_query(GET_SOUND_NAMES)
+    return _execute_query(query)
+
+def get_not_ffted_sound() -> list:
+    query = _load_sql_query(NOT_FFTED_SOUND)
+    return [x[0] for x in _execute_query(query)]
+
+def add_new_sound(filename):
+    query = _load_sql_query(ADD_SOUND_NAME)
+    _execute_query_with_param(query, param=(filename,))
+
+def add_fft_and_tempo(id, tempo, fft):
+    queries = _load_sql_query(ADD_FFT_AND_TEMPO).split(';')
+    _execute_query_with_param(queries[0] + ';', param=(id, tempo))
+    _execute_query_with_param(queries[1] + ';', param=(id, fft))

@@ -1,10 +1,8 @@
 from SoundTransformer import SoundTransformer
 from WindowManager import WindowManager as wm
 from WindowManager import WindowHandler as wh
-import Database as db
 
 st = SoundTransformer()
-
 
 def _update_soundbase(window):
     window.close()
@@ -23,7 +21,6 @@ def _recommend_song(window):
     print('DEBUG: song recommendated.')
 
 
-
 def create_initial_window():
     if st.has_new_files():
         new_song_window_handler = wh(wm.getNewSongsWindow())
@@ -38,7 +35,6 @@ def create_initial_window():
         pass
 
 def main():
-    db.init()
     create_initial_window()
 
 

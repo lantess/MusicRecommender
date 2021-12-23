@@ -7,6 +7,7 @@ import numpy as np
 import SoundDictionary as sd
 import CorrelationCalculator as cc
 from WindowManager import WindowManager as wm
+import Database as db
 
 MAIN_DIR = 'data'
 FFT_DIR = os.path.join(MAIN_DIR, 'fft')
@@ -18,29 +19,32 @@ FOURIER_SAMPLES = 640000
 FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
 
 class SoundTransformer:
-    def _load_metadata(self):
-        if os.path.exists(META_FILE):
-            with open(META_FILE, 'r') as file:
-                for line in file:
-                    name = line[:line.find(';')].strip()
-                    sd.put(name)
-                    data = sd.get(name)
-                    line = line[line.find(';') + 1:]
-                    data.fft_len = int(line[:line.find(';')])
-                    line = line[line.find(';')+1:]
-                    data.tempo = float(line[:line.find(';')])
 
     def _find_new_files(self):
-        for file in os.listdir(WAV_DIR):
-            if file.strip() not in sd.get_names():
-                self._new_files.append(file.strip())
+        db.init()
+        old_files = [x[0] for x in db.get_sound_names()]
+        new_files = [x for x in os.listdir(WAV_DIR) if x not in old_files]
+        if len(new_files) > 0:
+            self._new_files = True
+        for file in new_files:
+            db.add_new_sound(file)
 
     def _fourier_new_files(self, window):
+        new_files = db.get_not_ffted_sound()
         i = 0
-        max = len(self._new_files)
+        max = 1 if len(new_files) == 0 else len(new_files)
         wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
-        for filename in self._new_files:
-            sd.put(filename)
+        for id, filename in new_files:
+            file = os.path.join(WAV_DIR, filename)
+            y, sr = librosa.load(file, sr=None)
+            yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES))
+            data = struct.pack('f'*len(yf), *yf)
+            tempo = librosa.beat.tempo(sr=sr,
+                                       onset_envelope=librosa.onset.onset_strength(y, sr=sr))
+            db.add_fft_and_tempo(id, tempo, data)
+            i += 1
+            wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
+        ''' sd.put(filename)
             file = os.path.join(WAV_DIR, filename)
             y, sr = librosa.load(file, sr=None)
             yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES))
@@ -55,7 +59,7 @@ class SoundTransformer:
             filedata.tempo = tempo[0]
             filedata.fft_len = len(yf)
             i+=1
-            wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
+            wm.updateProgressWindow(window, 'Fouriering sounds', i, max)'''
 
     def _add_to_metafile(self, window):
         i = 0
@@ -104,21 +108,20 @@ class SoundTransformer:
                 wm.updateProgressWindow(window, 'Computing correlations', i, max)
 
     def __init__(self):
-        self._new_files = []
+        self._new_files = True #TODO: Zmienić na False przy ostatecznych testach
         self._matrix_filelist = []
         self._matrix = [[]]
-        self._load_metadata()
         self._find_new_files()
 
     def update_soundbase(self, window):
         window.Finalize()
-        self._fourier_new_files(window)
-        self._add_to_metafile(window)
-        self._update_matrix_legend(window)
-        self._load_matrix(window)
-        self._compute_correlation(window)
+        #self._fourier_new_files(window)
+        #self._add_to_metafile(window)
+        #self._update_matrix_legend(window)
+        #self._load_matrix(window)
+        #self._compute_correlation(window)
         window.close()
         print('DEBUG: soundbase updated.')
 
     def has_new_files(self):
-        return len(self._new_files) > 0
+        return self._new_files
