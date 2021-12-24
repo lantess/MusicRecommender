@@ -66,7 +66,7 @@ def get_sound_names() -> list:
 
 def get_not_ffted_sound() -> list:
     query = _load_sql_query(NOT_FFTED_SOUND)
-    return [x[0] for x in _execute_query(query)]
+    return _execute_query(query)
 
 def add_new_sound(filename):
     query = _load_sql_query(ADD_SOUND_NAME)

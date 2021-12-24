@@ -6,7 +6,7 @@ class WindowManager:
     def getMainWindow():
         layout = [[sg.Text('Enter music url:')],
                   [sg.Input(key='-INPUT-')],
-                  [sg.Button('Recommend'), sg.Button('Random')]]
+                  [sg.Button('Recommend'), sg.Button('Play', key='-PLAY-')]]
         return sg.Window('Music Recommender', layout)
 
     @staticmethod
