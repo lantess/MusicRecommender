@@ -16,11 +16,9 @@ import CorrelationCalculator as cc
     #TODO: kompresja wavów na mp3
     #TODO: siec neuronowa klasyfikująca
     #TODO: przebudować bazę danych
-    #TODO: transformata na poszczególnych częstotliwościach
+    #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
     #TODO: transformata na >10% mocy
     #TODO: MFCC (?)
-    #TODO: Klasy wysokości (?)
-    #TODO: constant-Q analiza (CQT)
     #TODO: RMS (librosa)
     #TODO: zero-crossing-rate (librosa)
     #TODO: frequency weighting
@@ -52,10 +50,7 @@ class SoundTransformer:
         for id, filename in new_files:
             file = os.path.join(WAV_DIR, filename)
             y, sr = librosa.load(file, sr=None)
-            #test
-            #print(librosa.cqt(y, sr=sr).shape) #TODO: cqt daje 84x?,więc to daje pewną myśl jak do tego podejść, ale to myślę że zrobię po świętach na trzeźwo xD
-            #test end
-            yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES, workers=-1))
+            yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES, workers=os.cpu_count()))
             data = struct.pack('f'*len(yf), *yf)
             tempo = librosa.beat.tempo(sr=sr,
                                        onset_envelope=librosa.onset.onset_strength(y, sr=sr))
