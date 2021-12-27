@@ -18,12 +18,14 @@ def _duration_to_seconds(duration: str) -> int:
 
 def _convert_to_wav_and_move():
     for file in os.listdir(st.NEW_WAV_DIR):
-        in_path = os.path.join(st.WAV_DIR, file)
+        print('DUPA 1')
+        in_path = os.path.join(st.NEW_WAV_DIR, file)
         out_path = in_path[:in_path.rfind('.')]+'.wav'
         print(in_path, out_path)
         stream = ffmpeg.input(in_path)
         stream = ffmpeg.output(stream, out_path)
-        ffmpeg.run(stream)
+        ffmpeg.run(stream, quiet=True)
+        print('DUPA 2')
 
 def _download(url: str):
     time.sleep(1) #cause sleep is the best concurrency friend, it helps making everything right
