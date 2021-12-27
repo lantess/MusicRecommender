@@ -2,28 +2,30 @@ from SoundTransformer import SoundTransformer
 from WindowManager import WindowManager as wm
 from WindowManager import WindowHandler as wh
 from MusicPlayer import MusicPlayer
+import PySimpleGUI as sg
 
 st = SoundTransformer()
 player = MusicPlayer()
 
-def _update_soundbase(window):
+def _update_soundbase(window: sg.Window):
     window.close()
     new_window = wm.getProgressWindow()
     st.update_soundbase(new_window)
 
-def _close_window(window):
+def _close_window(window: sg.Window):
     window.close()
 
 
-def _play_song(window):
-    if window['-PLAY-'].get_text() == 'Play':
-        window['-PLAY-'].update(text='Pause')
-        player.play('https://www.youtube.com/watch?v=dQw4w9WgXcQ') #TODO: argument
+def _play_song(window: sg.Window):
+    url = window['-INPUT-'].get()
+    window.close()
+    if len(url) == 0: #TODO: Komunikat o błędzie
+        player.play('https://www.youtube.com/watch?v=rrAI7lajCcw') #TODO: w sumie wszystko xD
     else:
-        window['-PLAY-'].update(text='Play')
+        player.play(url)
 
 
-def _recommend_song(window):
+def _random_song(window: sg.Window):
     print('DEBUG: song recommendated.')
 
 
@@ -35,8 +37,8 @@ def create_initial_window():
         new_song_window_handler.handle()
 
     main_windows_handler = wh(wm.getMainWindow())
-    main_windows_handler.addAction('-PLAY-', _play_song)
-    main_windows_handler.addAction('Recommend', _recommend_song)
+    main_windows_handler.addAction('Random', _random_song)
+    main_windows_handler.addAction('Recommend', _play_song)
     while main_windows_handler.handle():
         pass
 

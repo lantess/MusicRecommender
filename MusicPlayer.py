@@ -1,6 +1,10 @@
 import vlc
 import pafy
 import threading
+from WindowManager import WindowManager as wm, WindowHandler
+import time
+from PySimpleGUI import Window
+
 CODE_BAD_LINK = -1
 
 
@@ -12,11 +16,14 @@ def _duration_to_seconds(duration: str) -> int:
 
 
 def _download(url: str):
+    time.sleep(1) #cause sleep is the best concurrency friend, it helps making everything right
     youtube_video = pafy.new(url)
     audio_stream = youtube_video.getbestaudio()
-    audio_stream.download(filepath='../data/wav.old/'
+    audio_stream.download(filepath='data/wav.new/'
                                    + audio_stream.title
-                                   + '.' + audio_stream.extension)
+                                   + '.' + audio_stream.extension,
+                          quiet=True)
+    print('DOWNLOAD COMPLETE.')
 
 
 def _play(_vlc, _player, url: str):
@@ -26,6 +33,7 @@ def _play(_vlc, _player, url: str):
     media.get_mrl()
     _player.set_media(media)
     _player.play()
+    print('PLAYED.')
 
 
 class MusicPlayer:
@@ -35,12 +43,32 @@ class MusicPlayer:
         self._download_thread = None
         self._playing_thread = None
 
-    def play(self, url: str) -> int:
-        if url.find('youtube.com') == -1:
-            return CODE_BAD_LINK
-        _download_thread = threading.Thread(target=_download,
+    def _play(self, url: str):
+        if 'youtube.com' not in url:
+            return
+        self._download_thread = threading.Thread(target=_download,
                                             args=(url,))
-        _playing_thread = threading.Thread(target=_play,
+        self._playing_thread = threading.Thread(target=_play,
                                            args=(self._vlc, self._player, url))
-        _download_thread.start()
-        _playing_thread.start()
+        self._playing_thread.start()
+        self._download_thread.start()
+
+    def _return_to_main_window(self, window: Window):
+        window.close()
+        self._player.stop()
+        import Main
+        Main.create_initial_window()
+
+    def _open_player_window(self) -> WindowHandler:
+        self._playing_thread.join()
+        window = wm.getPlayerWindow()
+        window.finalize()
+        wh = WindowHandler(window)
+        wh.addCloseAction(self._return_to_main_window)
+        return wh
+
+    def play(self, url: str):
+        self._play(url)
+        wh = self._open_player_window()
+        while wh.handle():
+            pass
