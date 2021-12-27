@@ -131,6 +131,7 @@ dmypy.json
 # Redundant project data
 data/wav
 data/wav.prod
+data/wav.new
 data/database.db
 reports/
 

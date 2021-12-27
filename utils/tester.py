@@ -2,6 +2,7 @@ import youtube_dl
 import os
 import pygame.mixer as mixer
 import time
+from urllib.request import urlopen
 
 SAVE_PATH = '../data/wav.new'
 
@@ -22,5 +23,6 @@ for wav in os.listdir('../data/wav.new'):
     mixer.init()
     mixer.music.load(os.path.join('../data/wav.new', wav))
     mixer.music.play(-1, 0, 0)
-    time.sleep(30)
+    time.sleep(10)
     mixer.music.stop()
+

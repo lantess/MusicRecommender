@@ -1,9 +1,10 @@
 from SoundTransformer import SoundTransformer
 from WindowManager import WindowManager as wm
 from WindowManager import WindowHandler as wh
-import MusicPlayer as player
+from MusicPlayer import MusicPlayer
 
 st = SoundTransformer()
+player = MusicPlayer()
 
 def _update_soundbase(window):
     window.close()
@@ -15,12 +16,9 @@ def _close_window(window):
 
 
 def _play_song(window):
-    if window['-INPUT-'].get() == '':
-        window['-INPUT-'].update(value='Metallica- Mama Said.wav') #Hardkodowane do testów TODO: poprawić
-        player.play('Metallica- Mama Said.wav')
     if window['-PLAY-'].get_text() == 'Play':
         window['-PLAY-'].update(text='Pause')
-        player.stop()
+        player.play('https://www.youtube.com/watch?v=dQw4w9WgXcQ') #TODO: argument
     else:
         window['-PLAY-'].update(text='Play')
 
