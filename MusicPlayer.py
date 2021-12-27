@@ -68,12 +68,17 @@ class MusicPlayer:
         print("DEBUG: disliked.")
 
     def _on_pause_play_action(self, window: Window):
-        print("DEBUG: paused/played.")
+        key = window['-PLAY-PAUSE-'].get_text()
+        if key == 'Pause':
+            self._player.pause()
+            window['-PLAY-PAUSE-'].update(text='Play')
+        else:
+            self._player.play()
+            window['-PLAY-PAUSE-'].update(text='Pause')
 
     def _open_player_window(self) -> WindowHandler:
         window = wm.getPlayerWindow()
         window.finalize()
-        self._progress_bar = window['-PROGRESS-']
         wh = WindowHandler(window)
         wh.addCloseAction(self._return_to_main_window)
         wh.addAction('-LIKE-', self._on_like_action)
