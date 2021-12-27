@@ -11,9 +11,10 @@ import CorrelationCalculator as cc
     #TODO: usuwanie z bazy nieistniejących piosenek
     #TODO: updejt przy każdym braku, nie tylko nowych plikach
     #TODO: historia odsłuchów
-    #TODO: kompresja wavów na mp3
+    #TODO: kompresja wavów na mp3 (DONE (?))
     #TODO: siec neuronowa klasyfikująca
     #TODO: przebudować bazę danych
+    #TODO: kompresja transformaty
     #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
     #TODO: transformata na >10% mocy
     #TODO: MFCC (?)
@@ -25,6 +26,7 @@ import CorrelationCalculator as cc
 MAIN_DIR = 'data'
 FFT_DIR = os.path.join(MAIN_DIR, 'fft')
 WAV_DIR = os.path.join(MAIN_DIR, 'wav')
+NEW_WAV_DIR = os.path.join(MAIN_DIR, 'wav.new')
 FOURIER_SAMPLES = 640000
 FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
 

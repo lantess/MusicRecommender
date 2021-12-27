@@ -4,9 +4,11 @@ import threading
 from WindowManager import WindowManager as wm, WindowHandler
 import time
 from PySimpleGUI import Window
+import os
+import SoundTransformer as st
+import ffmpeg
 
-CODE_BAD_LINK = -1
-
+out_extension = 'wav'
 
 def _duration_to_seconds(duration: str) -> int:
     h = int(duration[:duration.find(':')])
@@ -14,6 +16,14 @@ def _duration_to_seconds(duration: str) -> int:
     s = int(duration[duration.rfind(':') + 1:])
     return h * 60 * 60 + m * 60 + s
 
+def _convert_to_wav_and_move():
+    for file in os.listdir(st.NEW_WAV_DIR):
+        in_path = os.path.join(st.WAV_DIR, file)
+        out_path = in_path[:in_path.rfind('.')]+'.wav'
+        print(in_path, out_path)
+        stream = ffmpeg.input(in_path)
+        stream = ffmpeg.output(stream, out_path)
+        ffmpeg.run(stream)
 
 def _download(url: str):
     time.sleep(1) #cause sleep is the best concurrency friend, it helps making everything right
@@ -23,7 +33,8 @@ def _download(url: str):
                                    + audio_stream.title
                                    + '.' + audio_stream.extension,
                           quiet=True)
-    print('DOWNLOAD COMPLETE.')
+    _convert_to_wav_and_move()
+
 
 class MusicPlayer:
     def __init__(self):
