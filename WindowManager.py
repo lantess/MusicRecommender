@@ -29,7 +29,6 @@ class WindowManager:
     @staticmethod
     def getPlayerWindow():
         layout = [[sg.Text('Loading track...', key='-TITLE-')],
-                  [sg.ProgressBar(1, key='-PROGRESS-')],
                   [sg.Button('Like', key='-LIKE-'),
                         sg.Button('Pause', key='-PLAY-PAUSE-'),
                         sg.Button('Dislike', key='-DISLIKE-')]]

@@ -25,31 +25,33 @@ def _download(url: str):
                           quiet=True)
     print('DOWNLOAD COMPLETE.')
 
-
-def _play(_vlc, _player, url: str):
-    youtube_video = pafy.new(url)
-    audio_stream = youtube_video.getbestaudio()
-    media = _vlc.media_new(audio_stream.url)
-    media.get_mrl()
-    _player.set_media(media)
-    _player.play()
-    print('PLAYED.')
-
-
 class MusicPlayer:
     def __init__(self):
         self._vlc = vlc.Instance()
         self._player = self._vlc.media_player_new()
         self._download_thread = None
         self._playing_thread = None
+        self._progress_thread = None
+        self._progress_bar = None
+        self._duration = -1
+
+    def __play(self, url: str):
+        youtube_video = pafy.new(url)
+        self._duration = _duration_to_seconds(youtube_video.duration)
+        audio_stream = youtube_video.getbestaudio()
+        media = self._vlc.media_new(audio_stream.url)
+        media.get_mrl()
+        self._player.set_media(media)
+        #TODO: zmiana wyświetlanego tytułu
+        self._player.play()
 
     def _play(self, url: str):
         if 'youtube.com' not in url:
             return
         self._download_thread = threading.Thread(target=_download,
                                             args=(url,))
-        self._playing_thread = threading.Thread(target=_play,
-                                           args=(self._vlc, self._player, url))
+        self._playing_thread = threading.Thread(target=self.__play,
+                                                args=(url,))
         self._playing_thread.start()
         self._download_thread.start()
 
@@ -59,12 +61,24 @@ class MusicPlayer:
         import Main
         Main.create_initial_window()
 
+    def _on_like_action(self, window: Window):
+        print("DEBUG: liked.")
+
+    def _on_dislike_action(self, window: Window):
+        print("DEBUG: disliked.")
+
+    def _on_pause_play_action(self, window: Window):
+        print("DEBUG: paused/played.")
+
     def _open_player_window(self) -> WindowHandler:
-        self._playing_thread.join()
         window = wm.getPlayerWindow()
         window.finalize()
+        self._progress_bar = window['-PROGRESS-']
         wh = WindowHandler(window)
         wh.addCloseAction(self._return_to_main_window)
+        wh.addAction('-LIKE-', self._on_like_action)
+        wh.addAction('-DISLIKE-', self._on_dislike_action)
+        wh.addAction('-PLAY-PAUSE-', self._on_pause_play_action)
         return wh
 
     def play(self, url: str):

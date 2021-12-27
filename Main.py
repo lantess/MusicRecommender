@@ -20,7 +20,7 @@ def _play_song(window: sg.Window):
     url = window['-INPUT-'].get()
     window.close()
     if len(url) == 0: #TODO: Komunikat o błędzie
-        player.play('https://www.youtube.com/watch?v=rrAI7lajCcw') #TODO: w sumie wszystko xD
+        player.play('https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley') #TODO: w sumie wszystko xD
     else:
         player.play(url)
 
