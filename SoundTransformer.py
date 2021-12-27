@@ -8,10 +8,8 @@ from WindowManager import WindowManager as wm
 import Database as db
 import CorrelationCalculator as cc
 
-
     #TODO: usuwanie z bazy nieistniejących piosenek
     #TODO: updejt przy każdym braku, nie tylko nowych plikach
-    #TODO: odtwarzanie muzyki
     #TODO: historia odsłuchów
     #TODO: kompresja wavów na mp3
     #TODO: siec neuronowa klasyfikująca
@@ -22,7 +20,6 @@ import CorrelationCalculator as cc
     #TODO: RMS (librosa)
     #TODO: zero-crossing-rate (librosa)
     #TODO: frequency weighting
-    #TODO: odtwarzanie muzyki z youtube'a
 
 
 MAIN_DIR = 'data'
