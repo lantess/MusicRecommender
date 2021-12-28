@@ -3,12 +3,10 @@
 #TODO: historia odsłuchów
 #TODO: siec neuronowa klasyfikująca
 #TODO: przebudować bazę danych
-#TODO: kompresja transformaty
 #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
 #TODO: transformata na >10% mocy
 #TODO: MFCC (?)
 #TODO: RMS (librosa)
 #TODO: zero-crossing-rate (librosa)
 #TODO: frequency weighting
-#TODO: wywalić zmienne do jakiegoś oddzielnego pliku, env czy coś nie wiem xD
 #TODO: zmiany nazw piosenek - usuwanie śmieci

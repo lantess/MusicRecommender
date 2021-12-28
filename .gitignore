@@ -132,7 +132,6 @@ dmypy.json
 data/wav
 data/wav.prod
 data/wav.new
-data/database.db
 reports/
 
 #Pycharm trash
