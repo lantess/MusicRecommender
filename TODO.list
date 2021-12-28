@@ -2,11 +2,12 @@
 #TODO: updejt przy każdym braku, nie tylko nowych plikach
 #TODO: historia odsłuchów
 #TODO: siec neuronowa klasyfikująca
-#TODO: przebudować bazę danych
 #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
 #TODO: transformata na >10% mocy
 #TODO: MFCC (?)
-#TODO: RMS (librosa)
 #TODO: zero-crossing-rate (librosa)
 #TODO: frequency weighting
-#TODO: zmiany nazw piosenek - usuwanie śmieci
+#TODO: zmiany nazw piosenek - usuwanie śmieci z nazwy
+#TODO: ubijanie procesu na zamknięcie okna
+#TODO: podzielić kod na paczki/podfoldery
+#TODO: obsługa okna ładowania w oddzielnym wątku żeby to się brało i nie lagowało
