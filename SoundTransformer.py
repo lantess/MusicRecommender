@@ -20,6 +20,11 @@ class SoundTransformer:
         for file in new_files:
             db.add_new_sound(file)
 
+    def _fft(self, y, sr) -> list:
+        ff = np.abs(librosa.stft(y, n_fft=int(sr)))
+        res = [np.average(x) for x in ff]
+        return res
+
     def _fourier_new_files(self, window):
         new_files = db.get_not_ffted_sound()
         i = 0
@@ -27,8 +32,8 @@ class SoundTransformer:
         wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
         for id, filename in new_files:
             file = os.path.join(var.WAV_DIR, filename)
-            y, sr = librosa.load(file, sr=None)
-            yf = np.abs(fft.rfft(y, n=var.FOURIER_SAMPLES, workers=os.cpu_count()))
+            y, sr = librosa.load(file, sr=var.FOURIER_SAMPLES)
+            yf = self._fft(y, sr)
             data = struct.pack('f'*len(yf), *yf)
             tempo = librosa.beat.tempo(sr=sr,
                                        onset_envelope=librosa.onset.onset_strength(y, sr=sr))

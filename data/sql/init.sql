@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS rms (
     id INTEGER PRIMARY KEY,
     data BLOB NOT NULL,
     FOREIGN KEY(id) REFERENCES song(id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS correlation (
     firstId INTEGER,
@@ -36,4 +36,4 @@ CREATE TABLE IF NOT EXISTS log (
     timestamp INTEGER,
     rate INTEGER,
     FOREIGN KEY(id) REFERENCES song(id)
-)
+);
