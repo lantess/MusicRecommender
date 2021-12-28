@@ -7,35 +7,14 @@ import numpy as np
 from WindowManager import WindowManager as wm
 import Database as db
 import CorrelationCalculator as cc
-
-    #TODO: usuwanie z bazy nieistniejących piosenek
-    #TODO: updejt przy każdym braku, nie tylko nowych plikach
-    #TODO: historia odsłuchów
-    #TODO: kompresja wavów na mp3 (DONE (?))
-    #TODO: siec neuronowa klasyfikująca
-    #TODO: przebudować bazę danych
-    #TODO: kompresja transformaty
-    #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
-    #TODO: transformata na >10% mocy
-    #TODO: MFCC (?)
-    #TODO: RMS (librosa)
-    #TODO: zero-crossing-rate (librosa)
-    #TODO: frequency weighting
-
-
-MAIN_DIR = 'data'
-FFT_DIR = os.path.join(MAIN_DIR, 'fft')
-WAV_DIR = os.path.join(MAIN_DIR, 'wav')
-NEW_WAV_DIR = os.path.join(MAIN_DIR, 'wav.new')
-FOURIER_SAMPLES = 640000
-FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
+import Variables as var
 
 class SoundTransformer:
 
     def _find_new_files(self):
         db.init()
         old_files = [x[0] for x in db.get_sound_names()]
-        new_files = [x for x in os.listdir(WAV_DIR) if x not in old_files]
+        new_files = [x for x in os.listdir(var.WAV_DIR) if x not in old_files]
         if len(new_files) > 0:
             self._new_files = True
         for file in new_files:
@@ -47,9 +26,9 @@ class SoundTransformer:
         max = 1 if len(new_files) == 0 else len(new_files)
         wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
         for id, filename in new_files:
-            file = os.path.join(WAV_DIR, filename)
+            file = os.path.join(var.WAV_DIR, filename)
             y, sr = librosa.load(file, sr=None)
-            yf = np.abs(fft.rfft(y, n=FOURIER_SAMPLES, workers=os.cpu_count()))
+            yf = np.abs(fft.rfft(y, n=var.FOURIER_SAMPLES, workers=os.cpu_count()))
             data = struct.pack('f'*len(yf), *yf)
             tempo = librosa.beat.tempo(sr=sr,
                                        onset_envelope=librosa.onset.onset_strength(y, sr=sr))

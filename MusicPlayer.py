@@ -5,7 +5,7 @@ from WindowManager import WindowManager as wm, WindowHandler
 import time
 from PySimpleGUI import Window
 import os
-import SoundTransformer as st
+import Variables as var
 import ffmpeg
 
 out_extension = 'wav'
@@ -17,15 +17,14 @@ def _duration_to_seconds(duration: str) -> int:
     return h * 60 * 60 + m * 60 + s
 
 def _convert_to_wav_and_move():
-    for file in os.listdir(st.NEW_WAV_DIR):
-        print('DUPA 1')
-        in_path = os.path.join(st.NEW_WAV_DIR, file)
-        out_path = in_path[:in_path.rfind('.')]+'.wav'
+    for file in os.listdir(var.NEW_WAV_DIR):
+        in_path = os.path.join(var.NEW_WAV_DIR, file)
+        out_path = os.path.join(var.WAV_DIR, file[:file.rfind('.')]+'.wav')
         print(in_path, out_path)
         stream = ffmpeg.input(in_path)
         stream = ffmpeg.output(stream, out_path)
         ffmpeg.run(stream, quiet=True)
-        print('DUPA 2')
+        os.remove(in_path)
 
 def _download(url: str):
     time.sleep(1) #cause sleep is the best concurrency friend, it helps making everything right

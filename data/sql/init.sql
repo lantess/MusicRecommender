@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS song (
     id INTEGER PRIMARY KEY,
-    filename TEXT NOT NULL UNIQUE
+    filename TEXT NOT NULL UNIQUE,
+    url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS tempo (
@@ -15,6 +16,12 @@ CREATE TABLE IF NOT EXISTS fft (
     FOREIGN KEY(id) REFERENCES song(id)
 );
 
+CREATE TABLE IF NOT EXISTS rms (
+    id INTEGER PRIMARY KEY,
+    data BLOB NOT NULL,
+    FOREIGN KEY(id) REFERENCES song(id)
+)
+
 CREATE TABLE IF NOT EXISTS correlation (
     firstId INTEGER,
     secondId INTEGER,
@@ -23,3 +30,10 @@ CREATE TABLE IF NOT EXISTS correlation (
     FOREIGN KEY(secondId) REFERENCES song(id),
     PRIMARY KEY(firstId, secondId)
 );
+
+CREATE TABLE log (
+    id INTEGER PRIMARY KEY,
+    timestamp INTEGER,
+    rate INTEGER,
+    FOREIGN KEY(id) REFERENCES song(id)
+)
