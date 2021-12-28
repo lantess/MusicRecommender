@@ -47,6 +47,7 @@ class SoundTransformer:
             db.add_correlation(pair[0], pair[1], value)
             i += 1
             wm.updateProgressWindow(window, 'Updating matrix', i, max)
+
     def _compute_correlation(self, window):
         pass
 

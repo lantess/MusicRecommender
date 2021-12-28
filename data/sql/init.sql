@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS correlation (
     PRIMARY KEY(firstId, secondId)
 );
 
-CREATE TABLE log (
+CREATE TABLE IF NOT EXISTS log (
     id INTEGER PRIMARY KEY,
     timestamp INTEGER,
     rate INTEGER,
