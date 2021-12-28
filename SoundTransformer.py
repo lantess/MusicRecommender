@@ -25,7 +25,11 @@ class SoundTransformer:
         res = [np.average(x) for x in ff]
         return res
 
-    def _fourier_new_files(self, window):
+    def _rms(self, y, sr) -> list:
+        rms = librosa.feature.rms(y=y, frame_length=sr)[0]
+        return rms
+
+    def _analyze_new_files(self, window):
         new_files = db.get_not_ffted_sound()
         i = 0
         max = 1 if len(new_files) == 0 else len(new_files)
@@ -37,7 +41,9 @@ class SoundTransformer:
             data = struct.pack('f'*len(yf), *yf)
             tempo = librosa.beat.tempo(sr=sr,
                                        onset_envelope=librosa.onset.onset_strength(y, sr=sr))
+            rms = self._rms(y, sr)
             db.add_fft_and_tempo(id, tempo, data)
+            db.add_rms(id, rms)
             i += 1
             wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
 
@@ -62,7 +68,7 @@ class SoundTransformer:
 
     def update_soundbase(self, window):
         window.Finalize()
-        self._fourier_new_files(window)
+        self._analyze_new_files(window)
         self._load_matrix(window)
         self._compute_correlation(window)
         window.close()

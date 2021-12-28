@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error as sqlError
 import os
+import struct
 
 DATABASE_FILE = 'data/database.db'
 QUERY_DIR = 'data/sql'
@@ -12,6 +13,7 @@ NOT_FFTED_SOUND = 'get_not_ffted_sound.sql'
 NEW_ID_PAIRS = 'not_existings_correlations.sql'
 FFT_BY_ID = 'get_fft_by_id.sql'
 NEW_CORRELATION = 'add_correlation.sql'
+ADD_RMS = 'add_rms.sql'
 
 def _load_sql_query(query_filename: str) -> str:
     try:
@@ -89,3 +91,8 @@ def get_data_from_pair(pair: tuple) -> list:
 def add_correlation(first: int, second: int, value: float):
     query = _load_sql_query(NEW_CORRELATION)
     _execute_query_with_param(query, (first, second, value))
+
+def add_rms(id: int, rms: list):
+    query = _load_sql_query(ADD_RMS)
+    data = struct.pack('f'*len(rms), *rms)
+    _execute_query_with_param(query, (id, data, len(data)))

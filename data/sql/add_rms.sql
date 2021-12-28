@@ -1,0 +1,1 @@
+INSERT INTO rms(id, data, len) VALUES (?, ?, ?);
