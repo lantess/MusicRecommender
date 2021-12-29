@@ -13,12 +13,17 @@ class SoundTransformer:
 
     def _find_new_files(self):
         db.execute_queries_with_no_params(query.INIT)
+        in_dir_files = os.listdir(var.WAV_DIR)
         old_files = [x[0] for x in db.execute_query(query.GET_SONG_NAMES)]
-        new_files = [x for x in os.listdir(var.WAV_DIR) if x not in old_files]
+        new_files = [x for x in in_dir_files if x not in old_files]
+        del_files = [x for x in old_files if x not in in_dir_files]
         if len(new_files) > 0:
             self._new_files = True
         for file in new_files:
             db.execute_query(query.ADD_SONG, params=(file,))
+        for file in del_files:
+            print('DEL:', file)
+            db.execute_query(query.DELETE_SONG, params=(file, ))
 
     def _fft(self, y, sr) -> list:
         ff = np.abs(librosa.stft(y, n_fft=int(sr)))

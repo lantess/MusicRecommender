@@ -38,8 +38,11 @@ class SQLQuery:
                 'PRIMARY KEY(firstId, secondId));',
             'CREATE TABLE IF NOT EXISTS log '
                 '(id INTEGER PRIMARY KEY, '
-                'timestamp INTEGER, '
+                'timestamp INTEGER NOT NULL, '
                 'rate INTEGER, '
+                'listening_time REAL NOT NULL, '
+                'skipped INTEGER NOT NULL,'
+                'language_code TEXT,'
                 'FOREIGN KEY(id) REFERENCES song(id));',
             'CREATE TABLE IF NOT EXISTS zcr '
                 '(id INTEGER PRIMARY KEY, '
@@ -65,3 +68,5 @@ class SQLQuery:
     ADD_TEMPO = 'INSERT INTO tempo (id, val) VALUES (?,?);'
     ADD_ZCR = 'INSERT INTO zcr (id, val) VALUES (?,?);'
     ADD_LISTEN_LOG = 'INSERT INTO log (id, timestamp, rate) VALUES (?,?,?);'
+
+    DELETE_SONG = 'DELETE FROM song WHERE filename = ?;'
