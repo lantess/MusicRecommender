@@ -5,9 +5,10 @@
 #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
 #TODO: transformata na >10% mocy
 #TODO: MFCC (?)
-#TODO: zero-crossing-rate (librosa)
 #TODO: frequency weighting
 #TODO: zmiany nazw piosenek - usuwanie śmieci z nazwy
 #TODO: ubijanie procesu na zamknięcie okna
 #TODO: podzielić kod na paczki/podfoldery
 #TODO: obsługa okna ładowania w oddzielnym wątku żeby to się brało i nie lagowało
+#TODO: przejrzeć tam w zakładce co mam zapisanego xD
+#TODO: obsługa innych odtwarzaczy niż youtube

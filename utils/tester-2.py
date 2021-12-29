@@ -1,14 +1,11 @@
 import librosa
 import matplotlib.pyplot as plt
-import scipy.fft as fft
-import numpy as np
 import os
+import numpy as np
 
-for file in os.listdir('../data/wav.new/'):
+for file in os.listdir('../data/wav/'):
     print(file)
-    y, sr = librosa.load(os.path.join('../data/wav.new/', file))
-    yf = np.abs(fft.rfft(y, workers=os.cpu_count()))
-    xf = fft.rfftfreq(len(y), d=1 / sr)
-    plt.plot(xf, yf)
+    y, sr = librosa.load(os.path.join('../data/wav/', file))
+    zcr = librosa.feature.zero_crossing_rate(y + 0.0001)
+    print(np.average(zcr[0]), len(zcr[0]), zcr[0])
 
-plt.show()

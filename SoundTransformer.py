@@ -23,11 +23,17 @@ class SoundTransformer:
     def _fft(self, y, sr) -> list:
         ff = np.abs(librosa.stft(y, n_fft=int(sr)))
         res = [np.average(x) for x in ff]
-        return res
+        fft_data = struct.pack('f'*len(res), *res)
+        return fft_data
 
-    def _rms(self, y, sr) -> list:
+    def _rms(self, y, sr):
         rms = librosa.feature.rms(y=y, frame_length=sr)[0]
-        return rms
+        rms_data = struct.pack('f' * len(rms), *rms)
+        return rms_data, len(rms)
+
+    def _zcr(self, y):
+        zcr = librosa.feature.zero_crossing_rate(y + 0.0001)
+        return np.average(zcr[0])
 
     def _analyze_new_files(self, window):
         new_files = db.execute_query(query.GET_SONG_IDS_NOT_IN_FFT)
@@ -37,15 +43,19 @@ class SoundTransformer:
         for id, filename in new_files:
             file = os.path.join(var.WAV_DIR, filename)
             y, sr = librosa.load(file, sr=var.FOURIER_SAMPLES)
-            yf = self._fft(y, sr)
-            fft_data = struct.pack('f'*len(yf), *yf)
-            tempo = librosa.beat.tempo(sr=sr,
-                                       onset_envelope=librosa.onset.onset_strength(y, sr=sr))
-            rms = self._rms(y, sr)
-            rms_data = struct.pack('f'*len(rms), *rms)
+
+            fft_data = self._fft(y, sr)
             db.execute_query(query.ADD_FFT, params=(id, fft_data))
+
+            tempo = librosa.beat.tempo(sr=sr, onset_envelope=librosa.onset.onset_strength(y, sr=sr))
             db.execute_query(query.ADD_TEMPO, params=(id, tempo))
-            db.execute_query(query.ADD_RMS, params=(id, rms_data, len(rms)))
+
+            rms, length = self._rms(y, sr)
+            db.execute_query(query.ADD_RMS, params=(id, rms, length))
+
+            zcr = self._zcr(y)
+            db.execute_query(query.ADD_ZCR, params=(id, zcr))
+
             i += 1
             wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
 
