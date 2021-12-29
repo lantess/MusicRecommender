@@ -9,7 +9,7 @@ DB_FILE = os.path.join(MAIN_DIR, 'database.db')
 
 FOURIER_SAMPLES = 20000
 FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
-
+MAG_BORDER = 0.1
 
 class SQLQuery:
     INIT = ['CREATE TABLE IF NOT EXISTS song '
@@ -30,6 +30,13 @@ class SQLQuery:
                 'len INTEGER NOT NULL, '
                 'FOREIGN KEY(id) REFERENCES song(id));',
             'CREATE TABLE IF NOT EXISTS correlation '
+                '(firstId INTEGER, '
+                'secondId INTEGER, '
+                'val REAL NOT NULL, '
+                'FOREIGN KEY(firstId) REFERENCES song(id), '
+                'FOREIGN KEY(secondId) REFERENCES song(id), '
+                'PRIMARY KEY(firstId, secondId));',
+            'CREATE TABLE IF NOT EXISTS high_mag_correlation '
                 '(firstId INTEGER, '
                 'secondId INTEGER, '
                 'val REAL NOT NULL, '
@@ -58,12 +65,20 @@ class SQLQuery:
                                     'SELECT firstId, secondId FROM correlation ' \
                                     'EXCEPT ' \
                                     'SELECT secondId, firstId FROM correlation;'
+    GET_NOT_EXISTING_HIGH_MAG_CORRELATIONS = 'SELECT DISTINCT f.id, s.id FROM song f ' \
+                                    'INNER JOIN song s ON f.id!=s.id ' \
+                                    'EXCEPT ' \
+                                    'SELECT firstId, secondId FROM high_mag_correlation ' \
+                                    'EXCEPT ' \
+                                    'SELECT secondId, firstId FROM high_mag_correlation;'
     GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id IN (?, ?);'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
 
     ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
     ADD_RMS = 'INSERT INTO rms(id, data, len) VALUES (?, ?, ?);'
-    ADD_CORELATION = 'INSERT INTO correlation (firstId, secondId, val) VALUES (?, ?, ?);'
+    ADD_CORRELATION = 'INSERT INTO correlation (firstId, secondId, val) VALUES (?, ?, ?);'
+    ADD_HIGH_MAG_CORRELATION = 'INSERT INTO high_mag_correlation (firstId, secondId, val) ' \
+                              'VALUES (?, ?, ?);'
     ADD_FFT = 'INSERT INTO fft (id, data) VALUES (?,?);'
     ADD_TEMPO = 'INSERT INTO tempo (id, val) VALUES (?,?);'
     ADD_ZCR = 'INSERT INTO zcr (id, val) VALUES (?,?);'

@@ -64,17 +64,29 @@ class SoundTransformer:
             i += 1
             wm.updateProgressWindow(window, 'Fouriering sounds', i, max)
 
-    def _load_matrix(self, window):
+    def _update_correlation_matrix(self, window):
         pair_list = db.execute_query(query.GET_NOT_EXISTING_CORRELATIONS)
         i = 0
         max = 1 if len(pair_list) == 0 else len(pair_list)
-        wm.updateProgressWindow(window, 'Updating matrix', i, max)
+        wm.updateProgressWindow(window, 'Updating correlation matrix', i, max)
         for pair in pair_list:
             data = db.execute_query(query.GET_FFT_BY_ID, params=pair)
             value = cc.calculate_correlation(data[0][0], data[1][0])
-            db.execute_query(query.ADD_CORELATION, params=(pair[0], pair[1], value))
+            db.execute_query(query.ADD_CORRELATION, params=(pair[0], pair[1], value))
             i += 1
-            wm.updateProgressWindow(window, 'Updating matrix', i, max)
+            wm.updateProgressWindow(window, 'Updating correlation matrix', i, max)
+
+    def _update_highets_magnitude_correlation_matrix(self, window):
+        pair_list = db.execute_query(query.GET_NOT_EXISTING_HIGH_MAG_CORRELATIONS)
+        i = 0
+        max = 1 if len(pair_list) == 0 else len(pair_list)
+        wm.updateProgressWindow(window, 'Updating high magnitude matrix', i, max)
+        for pair in pair_list:
+            data = db.execute_query(query.GET_FFT_BY_ID, params=pair)
+            value = cc.calculate_correlation_from_mag(data[0][0], data[1][0], var.MAG_BORDER)
+            db.execute_query(query.ADD_HIGH_MAG_CORRELATION, params=(pair[0], pair[1], value))
+            i += 1
+            wm.updateProgressWindow(window, 'Updating high magnitude matrix', i, max)
 
     def __init__(self):
         self._new_files = True #TODO: Zmienić na False przy ostatecznych testach
@@ -83,7 +95,8 @@ class SoundTransformer:
     def update_soundbase(self, window):
         window.Finalize()
         self._analyze_new_files(window)
-        self._load_matrix(window)
+        self._update_correlation_matrix(window)
+        self._update_correlation_matrix(window)
         window.close()
 
     def has_new_files(self):

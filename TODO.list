@@ -1,8 +1,6 @@
 #TODO: updejt przy każdym braku, nie tylko nowych plikach
 #TODO: historia odsłuchów
-#TODO: siec neuronowa klasyfikująca
 #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
-#TODO: transformata na >10% mocy
 #TODO: MFCC (?)
 #TODO: frequency weighting
 #TODO: zmiany nazw piosenek - usuwanie śmieci z nazwy
@@ -13,3 +11,4 @@
 #TODO: obsługa innych odtwarzaczy niż youtube
 #TODO: stworzenie nowej bazy danych (?)
 #TODO: updejt okienka odsłuchu
+#TODO: siec neuronowa klasyfikująca
