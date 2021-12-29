@@ -1,1 +1,0 @@
-INSERT INTO song (filename) VALUES (?);

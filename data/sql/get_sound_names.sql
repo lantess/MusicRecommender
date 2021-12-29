@@ -1,1 +1,0 @@
-SELECT filename FROM song;

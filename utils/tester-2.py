@@ -6,6 +6,8 @@ import numpy as np
 for file in os.listdir('../data/wav/'):
     print(file)
     y, sr = librosa.load(os.path.join('../data/wav/', file))
-    zcr = librosa.feature.zero_crossing_rate(y + 0.0001)
-    print(np.average(zcr[0]), len(zcr[0]), zcr[0])
-
+    yf = librosa.feature.mfcc(y=y, sr=sr)
+    print(yf.shape)
+    for mfcc in yf:
+        plt.plot(mfcc)
+    plt.show()

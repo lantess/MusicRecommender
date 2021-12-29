@@ -1,14 +1,11 @@
 #TODO: updejt przy każdym braku, nie tylko nowych plikach
 #TODO: historia odsłuchów
 #TODO: transformata na poszczególnych częstotliwościach (dla różnych rodzajów dźwięków)
-#TODO: MFCC (?)
-#TODO: frequency weighting
 #TODO: zmiany nazw piosenek - usuwanie śmieci z nazwy
 #TODO: ubijanie procesu na zamknięcie okna
 #TODO: podzielić kod na paczki/podfoldery
 #TODO: obsługa okna ładowania w oddzielnym wątku żeby to się brało i nie lagowało
 #TODO: przejrzeć tam w zakładce co mam zapisanego xD
 #TODO: obsługa innych odtwarzaczy niż youtube
-#TODO: stworzenie nowej bazy danych (?)
 #TODO: updejt okienka odsłuchu
 #TODO: siec neuronowa klasyfikująca

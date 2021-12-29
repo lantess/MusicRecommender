@@ -1,1 +1,0 @@
-SELECT id, filename FROM song WHERE id NOT IN (SELECT id FROM fft);

@@ -1,1 +1,0 @@
-SELECT data FROM fft WHERE id IN (?, ?);
