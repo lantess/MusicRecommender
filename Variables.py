@@ -10,6 +10,11 @@ DB_FILE = os.path.join(MAIN_DIR, 'database.db')
 FOURIER_SAMPLES = 20000
 FFT_LEN = int(FOURIER_SAMPLES / 2 + 1)
 MAG_BORDER = 0.1
+FFT_AVG_RANGES = [(0, 60), (60, 250),
+                  (250, 500), (500, 2000),
+                  (2000, 4000), (4000, 6000),
+                  (6000, FFT_LEN)]
+FFT_AVG_LEN = len(FFT_AVG_RANGES)
 
 class SQLQuery:
     INIT = ['CREATE TABLE IF NOT EXISTS song '
@@ -45,7 +50,7 @@ class SQLQuery:
                 'PRIMARY KEY(firstId, secondId));',
             'CREATE TABLE IF NOT EXISTS log '
                 '(id INTEGER PRIMARY KEY, '
-                'timestamp INTEGER NOT NULL, '
+                'timestamp REAL NOT NULL, '
                 'rate INTEGER, '
                 'listening_time REAL NOT NULL, '
                 'skipped INTEGER NOT NULL,'
@@ -54,7 +59,10 @@ class SQLQuery:
             'CREATE TABLE IF NOT EXISTS zcr '
                 '(id INTEGER PRIMARY KEY, '
                 'val REAL NOT NULL, '
-                'FOREIGN KEY(id) REFERENCES song(id));']
+                'FOREIGN KEY(id) REFERENCES song(id));',
+            'CREATE TABLE IF NOT EXISTS avg_range_fft '
+                '(id INTEGER PRIMARY KEY, '
+                'data BLOB NOT NULL);']
 
     GET_SONG_NAMES = 'SELECT filename FROM song;'
     GET_SONG_IDS_NOT_IN_FFT = 'SELECT id, filename FROM song ' \
@@ -72,7 +80,17 @@ class SQLQuery:
                                     'EXCEPT ' \
                                     'SELECT secondId, firstId FROM high_mag_correlation;'
     GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id IN (?, ?);'
+    GET_ALL_SONG_ID = 'SELECT id FROM song;'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
+    GET_ALL_IDS = ['SELECT DISTINCT id FROM tempo;',
+                   'SELECT DISTINCT id FROM fft;',
+                   'SELECT DISTINCT id FROM rms;',
+                   'SELECT DISTINCT firstId FROM correlation;',
+                   'SELECT DISTINCT secondId FROM correlation;',
+                   'SELECT DISTINCT firstId FROM high_mag_correlation;',
+                   'SELECT DISTINCT secondId FROM high_mag_correlation;',
+                   'SELECT DISTINCT id FROM zcr;',
+                   'SELECT DISTINCT id FROM avg_range_fft']
 
     ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
     ADD_RMS = 'INSERT INTO rms(id, data, len) VALUES (?, ?, ?);'
@@ -80,8 +98,11 @@ class SQLQuery:
     ADD_HIGH_MAG_CORRELATION = 'INSERT INTO high_mag_correlation (firstId, secondId, val) ' \
                               'VALUES (?, ?, ?);'
     ADD_FFT = 'INSERT INTO fft (id, data) VALUES (?,?);'
+    ADD_AVG_FFT = 'INSERT INTO avg_range_fft (id, data) VALUES (?,?);'
     ADD_TEMPO = 'INSERT INTO tempo (id, val) VALUES (?,?);'
     ADD_ZCR = 'INSERT INTO zcr (id, val) VALUES (?,?);'
-    ADD_LISTEN_LOG = 'INSERT INTO log (id, timestamp, rate) VALUES (?,?,?);'
+    ADD_LISTEN_LOG = 'INSERT INTO log (id, timestamp, rate, listening_time, skipped, language_code)' \
+                     ' VALUES (?,?,?,?,?,?);'
 
     DELETE_SONG = 'DELETE FROM song WHERE filename = ?;'
+

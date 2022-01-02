@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+import sys
 
 class WindowManager:
 
@@ -23,16 +24,24 @@ class WindowManager:
 
     @staticmethod
     def updateProgressWindow(window, label: str, i: int, max: int):
-        window['-PERCENT-'].update(value=label+' (' + str(int(i / max * 100)) + '%)')
+        if window is None:
+            return
+        window['-PERCENT-'].update(value=label + ' (' + str(i / max * 100) + '%)')
         window['-PROGRESS-'].update(current_count=i, max=max)
 
     @staticmethod
     def getPlayerWindow():
         layout = [[sg.Text('Loading track...', key='-TITLE-')],
                   [sg.Button('Like', key='-LIKE-'),
-                        sg.Button('Pause', key='-PLAY-PAUSE-'),
-                        sg.Button('Dislike', key='-DISLIKE-')]]
+                   sg.Button('Pause', key='-PLAY-PAUSE-'),
+                   sg.Button('Dislike', key='-DISLIKE-'),
+                   sg.Button('Next', key='-NEXT-')],
+                  [sg.Text('Volume:'),
+                   sg.Slider(range=(0, 100), default_value=50,
+                             orientation='h', enable_events=True,
+                             disable_number_display=True, key='-VOL-')]]
         return sg.Window('Recommender player', layout)
+
 
 class WindowHandler:
 
@@ -50,9 +59,9 @@ class WindowHandler:
         event, values = self._window.read()
         if event == sg.WIN_CLOSED:
             if 'CLOSED' in self._actions:
-                self._actions['CLOSED'](self._window)
+                self._actions['CLOSED'](self._window, values)
             self._window.close()
+            sys.exit(0)
         else:
-            self._actions[event](self._window)
+            self._actions[event](self._window, values)
         return event != sg.WIN_CLOSED
-
