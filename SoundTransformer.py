@@ -91,37 +91,6 @@ class SoundTransformer:
             while thread.is_alive():
                 wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
 
-    def _update_correlation_matrix(self, window):
-        pair_list = db.execute_query(query.GET_NOT_EXISTING_CORRELATIONS)
-        i = 0
-        max = 1 if len(pair_list) == 0 else len(pair_list)
-        wm.updateProgressWindow(window, 'Updating correlation matrix', i, max)
-        for pair in pair_list:
-            data = db.execute_query(query.GET_FFT_BY_ID, params=pair)
-            value = cc.calculate_correlation(data[0][0], data[1][0])
-            db.execute_query(query.ADD_CORRELATION, params=(pair[0], pair[1], value))
-            i += 1
-            wm.updateProgressWindow(window, 'Updating correlation matrix', i, max)
-
-    def _update_highets_magnitude_correlation_matrix(self, window):
-        '''
-        A gdyby tak nie pierdolić się z korelacjami i dodać wektor
-        procentów który zwraca z bazy takie te najbardziej
-        pasujące i dla nich liczy korelację???
-        :param window:
-        :return:
-        '''
-        pair_list = db.execute_query(query.GET_NOT_EXISTING_HIGH_MAG_CORRELATIONS)
-        i = 0
-        max = 1 if len(pair_list) == 0 else len(pair_list)
-        wm.updateProgressWindow(window, 'Updating high magnitude matrix', i, max)
-        for pair in pair_list:
-            data = db.execute_query(query.GET_FFT_BY_ID, params=pair)
-            value = cc.calculate_correlation_from_mag(data[0][0], data[1][0], var.MAG_BORDER)
-            db.execute_query(query.ADD_HIGH_MAG_CORRELATION, params=(pair[0], pair[1], value))
-            i += 1
-            wm.updateProgressWindow(window, 'Updating high magnitude matrix', i, max)
-            print(i)
 
     def __init__(self):
         self._new_files = False

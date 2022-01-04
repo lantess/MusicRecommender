@@ -16,6 +16,12 @@ FFT_AVG_RANGES = [(0, 60), (60, 250),
                   (6000, FFT_LEN)]
 FFT_AVG_LEN = len(FFT_AVG_RANGES)
 
+CORR_MAX = 10.0
+CORR_APPEND_PERCENT = 1.1
+CORR_N_MIN = 20
+CORR_N_MAX = 25
+
+
 class SQLQuery:
     INIT = ['CREATE TABLE IF NOT EXISTS song '
                 '(id INTEGER PRIMARY KEY, '
@@ -34,20 +40,6 @@ class SQLQuery:
                 'data BLOB NOT NULL, '
                 'len INTEGER NOT NULL, '
                 'FOREIGN KEY(id) REFERENCES song(id));',
-            'CREATE TABLE IF NOT EXISTS correlation '
-                '(firstId INTEGER, '
-                'secondId INTEGER, '
-                'val REAL NOT NULL, '
-                'FOREIGN KEY(firstId) REFERENCES song(id), '
-                'FOREIGN KEY(secondId) REFERENCES song(id), '
-                'PRIMARY KEY(firstId, secondId));',
-            'CREATE TABLE IF NOT EXISTS high_mag_correlation '
-                '(firstId INTEGER, '
-                'secondId INTEGER, '
-                'val REAL NOT NULL, '
-                'FOREIGN KEY(firstId) REFERENCES song(id), '
-                'FOREIGN KEY(secondId) REFERENCES song(id), '
-                'PRIMARY KEY(firstId, secondId));',
             'CREATE TABLE IF NOT EXISTS log '
                 '(id INTEGER PRIMARY KEY, '
                 'timestamp REAL NOT NULL, '
@@ -62,7 +54,8 @@ class SQLQuery:
                 'FOREIGN KEY(id) REFERENCES song(id));',
             'CREATE TABLE IF NOT EXISTS avg_range_fft '
                 '(id INTEGER PRIMARY KEY, '
-                'data BLOB NOT NULL);']
+                'data BLOB NOT NULL);',
+            'CREATE TABLE IF NOT EXISTS']
 
     GET_SONG_NAMES = 'SELECT filename FROM song;'
     GET_SONG_IDS_NOT_IN_FFT = 'SELECT id, filename FROM song ' \
@@ -79,7 +72,7 @@ class SQLQuery:
                                     'SELECT firstId, secondId FROM high_mag_correlation ' \
                                     'EXCEPT ' \
                                     'SELECT secondId, firstId FROM high_mag_correlation;'
-    GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id IN (?, ?);'
+    GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id = ?;'
     GET_ALL_SONG_ID = 'SELECT id FROM song;'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
     GET_ALL_IDS = ['SELECT DISTINCT id FROM tempo;',
@@ -91,6 +84,12 @@ class SQLQuery:
                    'SELECT DISTINCT secondId FROM high_mag_correlation;',
                    'SELECT DISTINCT id FROM zcr;',
                    'SELECT DISTINCT id FROM avg_range_fft']
+    GET_ALL_FROM_AVG_FFT = 'SELECT id, data FROM avg_range_fft;'
+    GET_FEATURES_BY_ID = 'SELECT tempo.val, zcr.val, log.timestamp, ' \
+            'log.rate, log.listening_time, log.skipped, log.language_code' \
+            'FROM tempo INNER JOIN zcr ON tempo.id = zcr.id' \
+            'INNER JOIN log ON tempo.id = log.id' \
+            'WHERE tempo.id = ?;'
 
     ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
     ADD_RMS = 'INSERT INTO rms(id, data, len) VALUES (?, ?, ?);'
