@@ -130,6 +130,7 @@ dmypy.json
 
 # Redundant project data
 data/
+data/database.db
 reports/
 
 #Pycharm trash
