@@ -16,10 +16,10 @@ FFT_AVG_RANGES = [(0, 60), (60, 250),
                   (6000, FFT_LEN)]
 FFT_AVG_LEN = len(FFT_AVG_RANGES)
 
-CORR_MAX = 10.0
+CORR_MAX = 500.0
 CORR_APPEND_PERCENT = 1.1
-CORR_N_MIN = 20
-CORR_N_MAX = 25
+CORR_N_MIN = 1000
+CORR_N_MAX = 1500
 
 
 class SQLQuery:
@@ -73,6 +73,7 @@ class SQLQuery:
                                     'EXCEPT ' \
                                     'SELECT secondId, firstId FROM high_mag_correlation;'
     GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id = ?;'
+    GET_RMS_BY_ID = 'SELECT data FROM rms WHERE id = ?;'
     GET_ALL_SONG_ID = 'SELECT id FROM song;'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
     GET_ALL_IDS = ['SELECT DISTINCT id FROM tempo;',
