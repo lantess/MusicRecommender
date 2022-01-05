@@ -56,23 +56,27 @@ class Recommender:
         return ffts
 
     def _rms_similar(self, main_id: int, similar_ids: list) -> dict:
-        main_rms = db.execute_query(query.GET_RMS_BY_ID, params=(main_id,))[0][0]
+        main_rms, main_rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(main_id,))[0]
         rmss = {}
         for rms_id in similar_ids:
-            rms = db.execute_query(query.GET_RMS_BY_ID, params=(rms_id,))[0][0]
-            corr = cc.calculate_correlation(main_rms, rms)
+            rms, rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(rms_id,))[0]
+            corr = 1 #cc.ca(main_rms, rms, length=rms_len) #TODO: obliczanie korelacji na podstawie różnych długości
             rmss[rms_id] = corr
         return rmss
 
     def _remove_last_played(self, similar_ids: list) -> list:
         return similar_ids#TODO: FILTER LAST PLAYED SONGS FROM RECOMMENDATION TO PREVENT LOOPING
 
-    def _transform_to_rows(self, similar_ids: dict) -> list:
+    def _transform_to_rows(self, ids: list, dicts: tuple) -> list:
         res_matrix = []
-        for s_id in similar_ids:
-            res = [s_id]
-        return similar_ids #SKONCZE RANO, TAK MYSLE
+        for r_id in ids:
+            res = list(db.execute_query(query.GET_FEATURES_BY_ID, params=(r_id,)))
+            for dict in dicts:
+                res.append(dict[r_id])
+            res_matrix.append(res)
+        return res_matrix #SKONCZE RANO, TAK MYSLE
                             #UPDATE 1:27 - zdecydowanie skończę rano xD
+                            #UPDATE 1:56 - jednak dzisiaj xD
 
     def __init__(self):
         self._dataset = db.execute_query(query.GET_ALL_FROM_AVG_FFT)

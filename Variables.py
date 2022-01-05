@@ -54,8 +54,7 @@ class SQLQuery:
                 'FOREIGN KEY(id) REFERENCES song(id));',
             'CREATE TABLE IF NOT EXISTS avg_range_fft '
                 '(id INTEGER PRIMARY KEY, '
-                'data BLOB NOT NULL);',
-            'CREATE TABLE IF NOT EXISTS']
+                'data BLOB NOT NULL);']
 
     GET_SONG_NAMES = 'SELECT filename FROM song;'
     GET_SONG_IDS_NOT_IN_FFT = 'SELECT id, filename FROM song ' \
@@ -73,7 +72,7 @@ class SQLQuery:
                                     'EXCEPT ' \
                                     'SELECT secondId, firstId FROM high_mag_correlation;'
     GET_FFT_BY_ID = 'SELECT data FROM fft WHERE id = ?;'
-    GET_RMS_BY_ID = 'SELECT data FROM rms WHERE id = ?;'
+    GET_RMS_BY_ID = 'SELECT data, len FROM rms WHERE id = ?;'
     GET_ALL_SONG_ID = 'SELECT id FROM song;'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
     GET_ALL_IDS = ['SELECT DISTINCT id FROM tempo;',
