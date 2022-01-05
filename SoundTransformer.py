@@ -6,7 +6,6 @@ import threading
 
 from WindowManager import WindowManager as wm
 import Database as db
-import CorrelationCalculator as cc
 import Variables as var
 from Variables import SQLQuery as query
 
@@ -24,7 +23,6 @@ class SoundTransformer:
         for file in new_files:
             db.execute_query(query.ADD_SONG, params=(file,))
         for file in del_files:
-            print('DEL:', file)
             db.execute_query(query.DELETE_SONG, params=(file,))
 
     def _find_analyse_absence(self):
@@ -33,8 +31,9 @@ class SoundTransformer:
             data = db.execute_query(q)
             data = [x for x in ids if x not in data]
             if len(data) > 0:
+                table_name = q[q.find('FROM')+5:q.rfind(';')]
+                self._absences[table_name] = data
                 self._new_files = True
-                return
 
     def _fft(self, y, sr) -> bytes:
         ff = np.abs(librosa.stft(y, n_fft=int(sr)))
@@ -94,6 +93,7 @@ class SoundTransformer:
 
     def __init__(self):
         self._new_files = False
+        self._absences = {}
         self._i = 0
         self._find_new_files()
         self._find_analyse_absence()

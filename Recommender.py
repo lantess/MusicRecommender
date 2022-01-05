@@ -59,8 +59,9 @@ class Recommender:
         main_rms, main_rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(main_id,))[0]
         rmss = {}
         for rms_id in similar_ids:
+            print(rms_id, main_id)
             rms, rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(rms_id,))[0]
-            corr = 1 #cc.ca(main_rms, rms, length=rms_len) #TODO: obliczanie korelacji na podstawie różnych długości
+            corr = cc.calculate_correlation_from_different_length(main_rms, main_rms_len, rms, rms_len) #TODO: obliczanie korelacji na podstawie różnych długości
             rmss[rms_id] = corr
         return rmss
 
@@ -87,7 +88,7 @@ class Recommender:
         fft_dict = self._fft_similar(main_id, not_last_played_ids)
         rms_dict = self._rms_similar(main_id, not_last_played_ids)
         hm_fft_dist = self._fft_similar(main_id, not_last_played_ids)
-        rows = self._transform_to_rows(fft_dict)
+        rows = self._transform_to_rows(similar_ids, (fft_dict, rms_dict, hm_fft_dist))
         print(len(similar_ids))
 
 
