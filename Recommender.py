@@ -59,7 +59,6 @@ class Recommender:
         main_rms, main_rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(main_id,))[0]
         rmss = {}
         for rms_id in similar_ids:
-            print(rms_id, main_id)
             rms, rms_len = db.execute_query(query.GET_RMS_BY_ID, params=(rms_id,))[0]
             corr = cc.calculate_correlation_from_different_length(main_rms, main_rms_len, rms, rms_len) #TODO: obliczanie korelacji na podstawie różnych długości
             rmss[rms_id] = corr
@@ -68,12 +67,23 @@ class Recommender:
     def _remove_last_played(self, similar_ids: list) -> list:
         return similar_ids#TODO: FILTER LAST PLAYED SONGS FROM RECOMMENDATION TO PREVENT LOOPING
 
-    def _transform_to_rows(self, ids: list, dicts: tuple) -> list:
+    def _get_range_fft_dict(self, similar_ids: list) -> dict:
+        ffts = {}
+        dataset = db.execute_query(query.GET_ALL_FROM_AVG_FFT)
+        for data in dataset:
+            if data[0] in similar_ids:
+                ffts[data[0]] = data[1]
+        return ffts
+
+    def _transform_to_rows(self, ids: list, dicts: tuple, range_ffts: dict) -> list:
         res_matrix = []
         for r_id in ids:
-            res = list(db.execute_query(query.GET_FEATURES_BY_ID, params=(r_id,)))
+            params = list(db.execute_query(query.GET_FEATURES_BY_ID, params=(r_id,)))
+            res = [r_id] + params if len(params > 0) else [r_id, 0, 0, 0, 0, 0, 0, 0]
+            print(res) #TODO: jeśli jest więcej rzędów, to dodać więcej wierszy
             for dict in dicts:
                 res.append(dict[r_id])
+            res += range_ffts[r_id]
             res_matrix.append(res)
         return res_matrix #SKONCZE RANO, TAK MYSLE
                             #UPDATE 1:27 - zdecydowanie skończę rano xD
@@ -88,9 +98,28 @@ class Recommender:
         fft_dict = self._fft_similar(main_id, not_last_played_ids)
         rms_dict = self._rms_similar(main_id, not_last_played_ids)
         hm_fft_dist = self._fft_similar(main_id, not_last_played_ids)
-        rows = self._transform_to_rows(similar_ids, (fft_dict, rms_dict, hm_fft_dist))
-        print(len(similar_ids))
+        range_ffts = self._get_range_fft_dict(not_last_played_ids)
+        rows = self._transform_to_rows(similar_ids,
+                                       (fft_dict, rms_dict, hm_fft_dist),
+                                       range_ffts)
 
 
 rec = Recommender()
 rec.process_to_datarow(666)
+
+'''
+    Dobra Adam skup się bo to ważne
+    Generujesz drzewo/sieć na podstawie wszystkich danych o odsłuchach
+    Potem zapisujesz je
+    Potem dla wybranych nowych testujesz co i jak kolego, nic straconego
+    Potem to kurwa trochę bez sensu
+    Nie no dobra skup się kurwa proszę chociaż raz w życiu
+    Dobra, to tak - chujnia trochę testować stare rzeczy i wgl, no ale cóż...
+    No i tak nie nauczę sieci wszystkimi możliwymi danymi, więc będę musiał zrobić jakieś 10-20k próbek i na podstawie tego to zrobić
+    No i bajlando, bo potem jest sens testować te 1k wierszy, bo nie będą koniecznie w lernówce
+    Adam jesteś nie taki głupi jak myślałem że jesteś
+    No i plan jest sprytny, bardzo sprytny, polecam serduszkiem
+    Tylko sieć czy co, bo nie wiem???
+    Chuj kurwa sieć neuronowa?
+    Dobra, ryzyk fizyk Twoja stara orangutan
+'''

@@ -83,9 +83,9 @@ class SQLQuery:
                    'SELECT DISTINCT id FROM avg_range_fft']
     GET_ALL_FROM_AVG_FFT = 'SELECT id, data FROM avg_range_fft;'
     GET_FEATURES_BY_ID = 'SELECT tempo.val, zcr.val, log.timestamp, ' \
-            'log.rate, log.listening_time, log.skipped, log.language_code' \
-            'FROM tempo INNER JOIN zcr ON tempo.id = zcr.id' \
-            'INNER JOIN log ON tempo.id = log.id' \
+            'log.rate, log.listening_time, log.skipped, log.language_code ' \
+            'FROM tempo INNER JOIN zcr ON tempo.id = zcr.id ' \
+            'INNER JOIN log ON tempo.id = log.id ' \
             'WHERE tempo.id = ?;'
 
     ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
