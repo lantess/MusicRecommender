@@ -101,4 +101,9 @@ class SQLQuery:
                      ' VALUES (?,?,?,?,?,?);'
 
     DELETE_SONG = 'DELETE FROM song WHERE filename = ?;'
+    DELETE_IDS = ['DELETE FROM tempo WHERE id = ?;',
+                  'DELETE FROM fft WHERE id = ?;',
+                  'DELETE FROM rms WHERE id = ?;',
+                  'DELETE FROM zcr WHERE id = ?;',
+                  'DELETE FROM avg_range_fft WHERE id = ?;']
 

@@ -12,6 +12,18 @@ from Variables import SQLQuery as query
 
 class SoundTransformer:
 
+    def _remove_redundant_data(self):
+        ids = [x[0] for x in db.execute_query(query.GET_ALL_SONG_ID)]
+        for i in range(len(query.GET_ALL_IDS)):
+            q_get = query.GET_ALL_IDS[i]
+            q_del = query.DELETE_IDS[i]
+            data = [x[0] for x in db.execute_query(q_get)]
+            data = [x for x in data if x not in ids]
+            print(q_get)
+            print(data)
+            for id in data:
+                db.execute_query(q_del, params=(id, ))
+
     def _find_new_files(self):
         db.execute_queries_with_no_params(query.INIT)
         in_dir_files = os.listdir(var.WAV_DIR)
@@ -24,14 +36,14 @@ class SoundTransformer:
             db.execute_query(query.ADD_SONG, params=(file,))
         for file in del_files:
             db.execute_query(query.DELETE_SONG, params=(file,))
+        self._remove_redundant_data()
+
 
     def _find_analyse_absence(self):
         ids = [x[0] for x in db.execute_query(query.GET_ALL_SONG_ID)]
         for q in query.GET_ALL_IDS:
             data = [x[0] for x in db.execute_query(q)]
             data = [x for x in ids if x not in data]
-            print(q)
-            print(data)
             self._absences.append(data)
             if len(data) > 0:
                 self._new_files = True
