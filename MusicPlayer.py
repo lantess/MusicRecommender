@@ -52,7 +52,6 @@ class MusicPlayer:
         self._download_thread = None
         self._playing_thread = None
         self._progress_thread = None
-        self._duration = -1
         self._window = None
         self._isLiked = 0
 
@@ -70,7 +69,6 @@ class MusicPlayer:
 
     def _youtube_play(self, url: str):
         youtube_video = pafy.new(url)
-        self._duration = _duration_to_seconds(youtube_video.duration)
         audio_stream = youtube_video.getbestaudio()
         media = self._vlc.media_new(audio_stream.url)
         media.get_mrl()
@@ -78,6 +76,13 @@ class MusicPlayer:
         self._window['-TITLE-'].update(value='Now playing: '+youtube_video.title)
         self._player.audio_set_volume(50)
         self._player.play()
+
+    def _play_local(self, path: str):
+        media = self._vlc.media_new(os.path.join(var.WAV_DIR, path))
+        self._player.pause()
+        self._player.set_media(media)
+        self._player.play()
+        self._window['-TITLE-'].update(value='Now playing: ' + path.replace('.wav', ''))
 
     def _play(self, url: str):
         if 'youtube.com' in url:
@@ -116,7 +121,10 @@ class MusicPlayer:
 
     def _next_song(self, window: Window, values: dict):
         label = self._window['-TITLE-'].get().replace('Now playing: ', '')
-        self._add_to_log(label, time.time(), True, self._isLiked)
+        #self._add_to_log(label, time.time(), True, self._isLiked)
+        #DEBUG TODO: tymczasowe rozwiązanie
+        path = db.execute_query(query.GET_RANDOM_SONG)[0][1]
+        self._play_local(path)
         pass #TODO: rekomendacja
 
     def _open_player_window(self) -> WindowHandler:

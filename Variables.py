@@ -87,6 +87,7 @@ class SQLQuery:
             'FROM tempo INNER JOIN zcr ON tempo.id = zcr.id ' \
             'INNER JOIN log ON tempo.id = log.id ' \
             'WHERE tempo.id = ?;'
+    GET_RANDOM_SONG = 'SELECT id, filename FROM song ORDER BY RANDOM() LIMIT 1;'
 
     ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
     ADD_RMS = 'INSERT INTO rms(id, data, len) VALUES (?, ?, ?);'
