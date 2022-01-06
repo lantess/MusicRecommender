@@ -8,7 +8,6 @@
 
 #TODO: rozpoznawanie gatunków i dodawanie etykiety (zakładki)
 
-#TODO: poprawić wykrywanie braków
 #TODO: reformat koduuuuuuuuuuuuuuuuuuuuuuuuuu
 #TODO: podzielić kod na paczki/podfoldery
 #TODO: zabijanie wątków xD
@@ -19,3 +18,10 @@
 #TODO: jeśli to jest nowa piosenka, to używa skróconej
 #Szybbka transformata Furiera (wkurwionego) to znalezienia najbardziej podobnych, potem dopiero rusza dalej z doborem dla X pasujących,
 #chuj wie w sumie ilu xD Może nawet korelację dla kilku pyknąć jak będzie się nudzić xD
+
+
+#FFT NA FREQUENCY DO ROWA
+#I SIĘ NIE AKTUALIZUJE PRZY UPDEJCIE
+#SIEĆ SIĘ UCZY
+
+#Generowanie najprzyjaźniejszych parametrów przez sieć a potem naiwny bayes/NNT wybiera z bazy to co najlepsze

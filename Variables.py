@@ -75,13 +75,10 @@ class SQLQuery:
     GET_RMS_BY_ID = 'SELECT data, len FROM rms WHERE id = ?;'
     GET_ALL_SONG_ID = 'SELECT id FROM song;'
     GET_SONG_ID_BY_NAME = 'SELECT id FROM song WHERE filename = ?'
+    GET_SONG_NAME_BY_ID = 'SELECT filename FROM song WHERE id = ?'
     GET_ALL_IDS = ['SELECT DISTINCT id FROM tempo;',
                    'SELECT DISTINCT id FROM fft;',
                    'SELECT DISTINCT id FROM rms;',
-                   'SELECT DISTINCT firstId FROM correlation;',
-                   'SELECT DISTINCT secondId FROM correlation;',
-                   'SELECT DISTINCT firstId FROM high_mag_correlation;',
-                   'SELECT DISTINCT secondId FROM high_mag_correlation;',
                    'SELECT DISTINCT id FROM zcr;',
                    'SELECT DISTINCT id FROM avg_range_fft']
     GET_ALL_FROM_AVG_FFT = 'SELECT id, data FROM avg_range_fft;'

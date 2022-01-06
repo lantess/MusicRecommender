@@ -28,11 +28,12 @@ class SoundTransformer:
     def _find_analyse_absence(self):
         ids = [x[0] for x in db.execute_query(query.GET_ALL_SONG_ID)]
         for q in query.GET_ALL_IDS:
-            data = db.execute_query(q)
+            data = [x[0] for x in db.execute_query(q)]
             data = [x for x in ids if x not in data]
+            print(q)
+            print(data)
+            self._absences.append(data)
             if len(data) > 0:
-                table_name = q[q.find('FROM')+5:q.rfind(';')]
-                self._absences[table_name] = data
                 self._new_files = True
 
     def _fft(self, y, sr) -> bytes:
@@ -57,29 +58,51 @@ class SoundTransformer:
             res.append(np.average(data[r[0]:r[1]]))
         return struct.pack('f' * var.FFT_AVG_LEN, *res)
 
+    def _tempo(self, y, sr):
+        pass
+
     def _analyze_thread(self, id, filename):
+        print(id, filename)
         file = os.path.join(var.WAV_DIR, filename)
+        print(file)
         y, sr = librosa.load(file, sr=var.FOURIER_SAMPLES)
-
-        fft_data = self._fft(y, sr)
-        db.execute_query(query.ADD_FFT, params=(id, fft_data))
-
-        fft_avg = self._range_fft(fft_data, var.FFT_LEN)
-        db.execute_query(query.ADD_AVG_FFT, params=(id, fft_avg))
-
-        tempo = librosa.beat.tempo(sr=sr, onset_envelope=librosa.onset.onset_strength(y, sr=sr))
-        db.execute_query(query.ADD_TEMPO, params=(id, tempo))
-
-        rms, length = self._rms(y, sr)
-        db.execute_query(query.ADD_RMS, params=(id, rms, length))
-
-        zcr = self._zcr(y)
-        db.execute_query(query.ADD_ZCR, params=(id, zcr))
-
+        if id in self._absences[1] or id in self._absences[4]:
+            fft_data = self._fft(y, sr)
+            if id in self._absences[1]:
+                db.execute_query(query.ADD_FFT, params=(id, fft_data))
+            if id in self._absences[4]:
+                fft_avg = self._range_fft(fft_data, var.FFT_LEN)
+                db.execute_query(query.ADD_AVG_FFT, params=(id, fft_avg))
+        if id in self._absences[0]:
+            tempo = librosa.beat.tempo(sr=sr, onset_envelope=librosa.onset.onset_strength(y, sr=sr))
+            db.execute_query(query.ADD_TEMPO, params=(id, tempo))
+        if id in self._absences[2]:
+            rms, length = self._rms(y, sr)
+            db.execute_query(query.ADD_RMS, params=(id, rms, length))
+        if id in self._absences[3]:
+            zcr = self._zcr(y)
+            db.execute_query(query.ADD_ZCR, params=(id, zcr))
         self._i += 1
 
+
     def _analyze_new_files(self, window):
-        new_files = db.execute_query(query.GET_SONG_IDS_NOT_IN_FFT)
+        self._i = 0
+        ids = []
+        for l in self._absences:
+            ids += l
+        ids = list(set(ids))
+        max = len(ids)
+        max = max if max > 0 else 1
+        for id in ids:
+            wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
+            filename = db.execute_query(query.GET_SONG_NAME_BY_ID, params=(id,))[0][0]
+            thread = threading.Thread(target=self._analyze_thread,
+                                      args=(id, filename))
+            thread.start()
+            while thread.is_alive():
+                wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
+
+        '''new_files = db.execute_query(query.GET_SONG_IDS_NOT_IN_FFT)
         self._i = 0
         max = 1 if len(new_files) == 0 else len(new_files)
         wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
@@ -88,12 +111,12 @@ class SoundTransformer:
                                       args=(id, filename))
             thread.start()
             while thread.is_alive():
-                wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
+                wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)'''
 
 
     def __init__(self):
         self._new_files = False
-        self._absences = {}
+        self._absences = []
         self._i = 0
         self._find_new_files()
         self._find_analyse_absence()
