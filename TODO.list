@@ -23,3 +23,5 @@
 #SIEĆ SIĘ UCZY
 
 #Generowanie najprzyjaźniejszych parametrów przez sieć a potem naiwny bayes/NNT wybiera z bazy to co najlepsze
+
+#TODO: może długości piosenek bym wybierał żeby ten, no, ogarnąć po jakim czasie została pominięta?

@@ -1,6 +1,8 @@
 import PySimpleGUI as sg
 import sys
 
+import Variables as var
+
 class WindowManager:
 
     @staticmethod
@@ -37,7 +39,7 @@ class WindowManager:
                    sg.Button('Dislike', key='-DISLIKE-'),
                    sg.Button('Next', key='-NEXT-')],
                   [sg.Text('Volume:'),
-                   sg.Slider(range=(0, 100), default_value=50,
+                   sg.Slider(range=(0, 100), default_value=var.START_VOLUME,
                              orientation='h', enable_events=True,
                              disable_number_display=True, key='-VOL-')]]
         return sg.Window('Recommender player', layout)

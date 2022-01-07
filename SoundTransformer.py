@@ -19,8 +19,6 @@ class SoundTransformer:
             q_del = query.DELETE_IDS[i]
             data = [x[0] for x in db.execute_query(q_get)]
             data = [x for x in data if x not in ids]
-            print(q_get)
-            print(data)
             for id in data:
                 db.execute_query(q_del, params=(id, ))
 
@@ -113,18 +111,6 @@ class SoundTransformer:
             thread.start()
             while thread.is_alive():
                 wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
-
-        '''new_files = db.execute_query(query.GET_SONG_IDS_NOT_IN_FFT)
-        self._i = 0
-        max = 1 if len(new_files) == 0 else len(new_files)
-        wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)
-        for id, filename in new_files:
-            thread = threading.Thread(target=self._analyze_thread,
-                                      args=(id, filename))
-            thread.start()
-            while thread.is_alive():
-                wm.updateProgressWindow(window, 'Fouriering sounds', self._i, max)'''
-
 
     def __init__(self):
         self._new_files = False

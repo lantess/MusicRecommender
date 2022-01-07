@@ -1,11 +1,13 @@
 from SoundTransformer import SoundTransformer
 from WindowManager import WindowManager as wm
 from WindowManager import WindowHandler as wh
-from MusicPlayer import MusicPlayer
+from MediaPlayer import MediaPlayer
 import PySimpleGUI as sg
+import Database as db
+from Variables import SQLQuery as query
 
 st = SoundTransformer()
-player = MusicPlayer()
+player = MediaPlayer()
 
 
 def _update_soundbase(window: sg.Window, values: dict):
@@ -28,7 +30,9 @@ def _play_song(window: sg.Window, values: dict):
 
 
 def _random_song(window: sg.Window, values: dict):
-    print('DEBUG: song recommendated.', values)
+    path = db.execute_query(query.GET_RANDOM_SONG)[0][1]
+    window.close()
+    player.play(path)
 
 
 def create_initial_window():
