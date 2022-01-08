@@ -31,7 +31,8 @@ class SoundTransformer:
         if len(new_files) > 0:
             self._new_files = True
         for file in new_files:
-            db.execute_query(query.ADD_SONG, params=(file,))
+            duration = librosa.get_duration(filename=file)
+            db.execute_query(query.ADD_SONG, params=(file, duration))
         for file in del_files:
             db.execute_query(query.DELETE_SONG, params=(file,))
         self._remove_redundant_data()

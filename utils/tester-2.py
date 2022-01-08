@@ -1,3 +1,14 @@
-import locale
+import Database as db
+import Variables as var
+import librosa
+import os
 
-print(locale.getdefaultlocale()[0])
+
+
+ids = db.execute_query('SELECT id, filename FROM song WHERE duration is NULL;')
+
+for id, filename in ids:
+    file = os.path.join(var.WAV_DIR, filename)
+    duration = int(librosa.get_duration(filename=file))
+    print(id, filename, duration)
+    db.execute_query('UPDATE song SET duration = ? WHERE id = ?', params=(duration, id))

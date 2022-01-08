@@ -90,7 +90,7 @@ class SQLQuery:
             'WHERE tempo.id = ?;'
     GET_RANDOM_SONG = 'SELECT id, filename FROM song ORDER BY RANDOM() LIMIT 1;'
 
-    ADD_SONG = 'INSERT INTO song (filename) VALUES (?);'
+    ADD_SONG = 'INSERT INTO song (filename, duration) VALUES (?, ?);'
     ADD_RMS = 'INSERT INTO rms(id, data, len) VALUES (?, ?, ?);'
     ADD_CORRELATION = 'INSERT INTO correlation (firstId, secondId, val) VALUES (?, ?, ?);'
     ADD_HIGH_MAG_CORRELATION = 'INSERT INTO high_mag_correlation (firstId, secondId, val) ' \
