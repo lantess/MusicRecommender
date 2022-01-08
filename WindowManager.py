@@ -46,10 +46,14 @@ class WindowManager:
 
 
 class WindowHandler:
+    def _do_nothing(self, window: sg.Window, values: dict):
+        pass
 
     def __init__(self, window):
         self._window = window
         self._actions = {}
+        self._actions['TIMEOUT'] = self._do_nothing
+        self._actions['CLOSED'] = self._do_nothing
 
     def addAction(self, event: str, action):
         self._actions[event] = action
@@ -58,10 +62,9 @@ class WindowHandler:
         self._actions['CLOSED'] = action
 
     def handle(self) -> bool:
-        event, values = self._window.read()
+        event, values = self._window.read(timeout=200, timeout_key='TIMEOUT')
         if event == sg.WIN_CLOSED:
-            if 'CLOSED' in self._actions:
-                self._actions['CLOSED'](self._window, values)
+            self._actions['CLOSED'](self._window, values)
             self._window.close()
             sys.exit(0)
         else:

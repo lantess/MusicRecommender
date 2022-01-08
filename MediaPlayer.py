@@ -122,19 +122,16 @@ class MediaPlayer:
         self._player.play()
 
     def _play_next_if_song_ends(self):
-        while self._startTime != -1:
-            while 1000000 > (time.time() - self._startTime) > 5:
-                print('CHUJ', self._player.is_playing(), time.time() - self._startTime)
-                if not self._player.is_playing():
-                    label = self._window['-TITLE-'].get().replace('Now playing: ', '')
-                    self._add_to_log(label, self._startTime, False, self._isLiked)
-                    path = db.execute_query(query.GET_RANDOM_SONG)[0][1]
-                    self._playing_thread = threading.Thread(target=self._play_local,
-                                                            args=(path,))
-                    self._playing_thread.start()
+        if 1000000 > (time.time() - self._startTime) > 5:
+            if not self._player.is_playing():
+                label = self._window['-TITLE-'].get().replace('Now playing: ', '')
+                self._add_to_log(label, self._startTime, False, self._isLiked)
+                path = db.execute_query(query.GET_RANDOM_SONG)[0][1]
+                self._playing_thread = threading.Thread(target=self._play_local,
+                                                        args=(path,))
+                self._playing_thread.start()
 
-
-    def play(self, song_source: str):
+    def _play(self, song_source: str):
         if song_source.find('http://') != -1 or song_source.find('https://') != -1:
             if 'youtube.com' in song_source:
                 self._download_thread = threading.Thread(target=_download,
@@ -151,4 +148,8 @@ class MediaPlayer:
         self._open_player_window()
         self._playing_thread.start()
         while self._wh.handle():
-            pass
+            self._play_next_if_song_ends()
+
+    def play(self, song_source: str):
+        self._play(song_source)
+
