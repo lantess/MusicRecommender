@@ -2,13 +2,15 @@ import Database as db
 import Variables as var
 import librosa
 import os
+import struct
+import numpy as np
+import codecs
+import threading
+import Database as db
+from Variables import SQLQuery as query
+import time
 
 
+t = 1641645685.04283
 
-ids = db.execute_query('SELECT id, filename FROM song WHERE duration is NULL;')
-
-for id, filename in ids:
-    file = os.path.join(var.WAV_DIR, filename)
-    duration = int(librosa.get_duration(filename=file))
-    print(id, filename, duration)
-    db.execute_query('UPDATE song SET duration = ? WHERE id = ?', params=(duration, id))
+print(time.localtime(t))

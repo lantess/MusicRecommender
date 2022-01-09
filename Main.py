@@ -40,7 +40,8 @@ def create_initial_window():
         new_song_window_handler = wh(wm.getNewSongsWindow())
         new_song_window_handler.addAction('Yes', _update_soundbase)
         new_song_window_handler.addAction('No', _close_window)
-        new_song_window_handler.handle()
+        while new_song_window_handler.handle():
+            pass
 
     main_windows_handler = wh(wm.getMainWindow())
     main_windows_handler.addAction('Random', _random_song)

@@ -85,7 +85,7 @@ class SoundTransformer:
                 fft_avg = self._range_fft(fft_data, var.FFT_LEN)
                 db.execute_query(query.ADD_AVG_FFT, params=(id, fft_avg))
         if id in self._absences[0]:
-            tempo = librosa.beat.tempo(sr=sr, onset_envelope=librosa.onset.onset_strength(y, sr=sr))
+            tempo = librosa.beat.tempo(sr=sr, onset_envelope=librosa.onset.onset_strength(y, sr=sr))[0]
             db.execute_query(query.ADD_TEMPO, params=(id, tempo))
         if id in self._absences[2]:
             rms, length = self._rms(y, sr)

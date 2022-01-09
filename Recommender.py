@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 '''
 import struct
 import numpy as np
+import time
 
 import Database as db
 from Variables import SQLQuery as query
@@ -75,19 +76,37 @@ class Recommender:
                 ffts[data[0]] = data[1]
         return ffts
 
-    def _transform_to_rows(self, ids: list, dicts: tuple, range_ffts: dict) -> list:
+    def _timestamp_to_time_data(self, timestamp: float) -> tuple:
+        tdata = time.localtime(timestamp)
+        return (tdata.tm_wday,
+                tdata.tm_mon,
+                1 if tdata.tm_wday > 4 else 0,
+                tdata.tm_hour,
+                tdata.tm_year)
+
+    def _transform_to_rows(self, ids: list, dicts: tuple, range_ffts: dict) -> tuple:
+        '''
+            label: id, rate
+            data: tempo, time(weekday, month, isWeekend, hour_range, year),
+                % listened, isSkipped, language, zcr, avg_fft(7 els), fft_correlation,
+                high_mag_fft_correlation, rms_correlation
+            ROWS TO LEARN THE NETWORK    
+        ''' #(fft_dict, rms_dict, hm_fft_dist),
         res_matrix = []
+        label_matrix = []
         for r_id in ids:
-            params = list(db.execute_query(query.GET_FEATURES_BY_ID, params=(r_id,)))
-            res = [r_id] + params if len(params > 0) else [r_id, 0, 0, 0, 0, 0, 0, 0]
-            print(res) #TODO: jeśli jest więcej rzędów, to dodać więcej wierszy
-            for dict in dicts:
-                res.append(dict[r_id])
-            res += range_ffts[r_id]
-            res_matrix.append(res)
-        return res_matrix #SKONCZE RANO, TAK MYSLE
-                            #UPDATE 1:27 - zdecydowanie skończę rano xD
-                            #UPDATE 1:56 - jednak dzisiaj xD
+            data_tuples = db.execute_query(query.GET_FEATURES_BY_ID, params=(r_id,))
+            duration = db.execute_query(query.GET_SONG_DURATION_BY_ID, params=(r_id,))[0][0]
+            for tempo, zrc, timestamp, rate, listening_time, skipped, language_code in data_tuples:
+                tdata = self._timestamp_to_time_data(timestamp)
+                res = [tempo, tdata[0], tdata[1], tdata[2], tdata[3], tdata[4],
+                       listening_time/duration, skipped, language_code, zrc]
+                res += range_ffts[r_id]
+                for d in dicts:
+                    res.append(d[r_id])
+                res_matrix.append(res)
+                label_matrix.append([r_id, rate])
+        return res_matrix, label_matrix
 
     def __init__(self):
         self._dataset = db.execute_query(query.GET_ALL_FROM_AVG_FFT)
@@ -99,9 +118,11 @@ class Recommender:
         rms_dict = self._rms_similar(main_id, not_last_played_ids)
         hm_fft_dist = self._fft_similar(main_id, not_last_played_ids)
         range_ffts = self._get_range_fft_dict(not_last_played_ids)
-        rows = self._transform_to_rows(similar_ids,
-                                       (fft_dict, rms_dict, hm_fft_dist),
+        labels, rows = self._transform_to_rows(similar_ids,
+                                       (fft_dict, hm_fft_dist, rms_dict),
                                        range_ffts)
+        print(labels)
+        print(rows)
 
 
 rec = Recommender()

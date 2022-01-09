@@ -122,6 +122,7 @@ class MediaPlayer:
         self._player.play()
 
     def _play_next_if_song_ends(self):
+        #TODO: Tu narazie jest ścierniko, ale będzie rekomendacja
         if 1000000 > (time.time() - self._startTime) > 5:
             if not self._player.is_playing():
                 label = self._window['-TITLE-'].get().replace('Now playing: ', '')
